@@ -9,7 +9,6 @@ from info_bar import InfoBar
 hp_bar = None
 mp_bar = None
 buttons = [[None for i in range(4)] for j in range(2)]
-hover_bar = None
 
 class StatBar:
     def __init__(self, master, my_time, my_msg, player):
@@ -25,8 +24,8 @@ class StatBar:
         hover_frame = tk.Frame(master,bg="green",width=m_c.hover_w,height=m_c.hover_h,highlightthickness=0)
         hover_frame.grid(row=0,column=7,rowspan=2)
 
-        global hover_bar
-        hover_bar = InfoBar(hover_frame,my_time)
+
+        self.hover_bar = InfoBar(hover_frame,my_time)
 
 
     def make_mid_buttons(self):
@@ -38,21 +37,26 @@ class StatBar:
                 buttons[i][j] = BarButton("errorBlock",self.my_time)
                 buttons[i][j].attach_canvas(button_canvas[i][j])
                 button_canvas[i][j].grid(row=i, column=2 + j)
+
         #special buttons
         buttons[0][0].replace_image("moveButton")
         buttons[0][0].register_object()
         buttons[0][0].register_move(self.my_player,Player.WALK)
         buttons[0][0].attach_message_core(self.my_msg)
+        buttons[0][0].add_button_description("Move (Q)","walk around the tiles, all fancy-like")
+
 
         buttons[0][1].replace_image("blockButton")
         buttons[0][1].register_object()
         buttons[0][1].register_move(self.my_player,Player.BLOCK)
         buttons[0][1].attach_message_core(self.my_msg)
+        buttons[0][1].add_button_description("Block (W)","Brace in a direction to reduce injuries")
 
         buttons[0][2].replace_image("punchButton")
         buttons[0][2].register_object()
         buttons[0][2].register_move(self.my_player,Player.PUNCH)
         buttons[0][2].attach_message_core(self.my_msg)
+        buttons[0][2].add_button_description("Punch (E)","Agress enemies and map tiles")
 
     def make_spacers(self):
         self.fill_wall = tk.PhotoImage(file="./images/statbar/filler.gif")
@@ -82,11 +86,6 @@ class StatBar:
         mp_bar.recolor_bar("light blue", "blue")
         mp_bar.retype_bar("MP")
 
-    def animate(self,player):
-        if(player.action=="walk"):
-            buttons[0][0].replace_cover(True)
-            buttons[0][2].replace_cover(False)
-        elif(player.action=="punch"):
-            buttons[0][2].replace_cover(True)
-            buttons[0][0].replace_cover(False)
+    def get_hover(self):
+        return self.hover_bar
 

@@ -117,7 +117,7 @@ class mapTile(ProtoAnim):
         self.my_canvas.tag_bind(self.name,"<Leave>", self.hover_out)
 
     def hover_in(self,event):
-        self.msg_packet = ['console',self.info_tuple[0],self.info_tuple[2],m_c.PRIO_HOVER_BACK,0,False]
+        self.msg_packet = ['hover',self.info_tuple[0],self.info_tuple[2],m_c.PRIO_HOVER_BACK,0,False]
         self.msg_pipe.add_message_candidate(self.msg_tag,self.msg_packet)
 
     def hover_out(self,event):

@@ -74,6 +74,11 @@ class Player(ProtoAnim):
         if CONSOLE:
             print("queued move type " + str(self.mode))
 
+    def set_move(self,num):
+        self.mode = num
+        if CONSOLE:
+            print("queued move type " + str(self.mode))
+
     def is_turn(self):
         return self.game_state.player_can_move(1)
 
@@ -153,7 +158,7 @@ class Player(ProtoAnim):
         self.my_canvas.tag_bind(self.name,"<Leave>", self.hover_out)
 
     def hover_in(self,event):
-        self.msg_packet = ['console','player','hey that\'s you!',m_c.PRIO_HOVER_FORE,0,False]
+        self.msg_packet = ['hover','player','hey that\'s you!',m_c.PRIO_HOVER_FORE,0,False]
         self.msg_pipe.add_message_candidate(self.msg_tag,self.msg_packet)
 
     def hover_out(self,event):

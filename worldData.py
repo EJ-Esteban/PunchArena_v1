@@ -53,7 +53,7 @@ TILE_LIB[GLASS_CRACKED] = (
     "Glass", "glassb", "This glass window is cracked.",
     1 , 0)
 TILE_LIB[GLASS_MISSING] = (
-    "Floor", "glassa", "There are a bunch of glass shards on te floor!.",
+    "Floor", "glassa", "There are a bunch of glass shards on the floor!.",
     1 , 0)
 TILE_LIB[LAVA] = (
     "Lava", "lava", "Only an idiot would try walking on lava.",
@@ -83,6 +83,10 @@ NEXT_BREAK[GLASS]=GLASS_CRACKED
 NEXT_BREAK[GLASS_CRACKED]=GLASS_MISSING
 NEXT_BREAK[ERROR]=FLOOR
 
+####################################################################################################
+#MAPS START HERE
+#
+####################################################################################################
 
 #empty void
 ev = dict()

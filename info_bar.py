@@ -19,13 +19,21 @@ class InfoBar(ProtoAnim):
 
         self.populate_hpmp_canvas()
         self.populate_text_canvas()
-
-        self.register_object()
+        self.activate_canvas(InfoBar.TEXT)
+        #self.register_object()
 
     def populate_text_canvas(self):
         global text_cover
         text_cover = tk.PhotoImage(file = './images/statbar/hovercover.gif')
+
+        self.my_canvas[InfoBar.TEXT].create_text(15,10, anchor="nw",text="asdf",tag="bigtext",font="helvetica 12 bold", width = 120)
+        self.my_canvas[InfoBar.TEXT].create_text(15,30, anchor="nw",text="asdf",tag="smalltext",font="helvetica 9 italic", width = 120)
+
         self.my_canvas[InfoBar.TEXT].create_image(0,0, anchor="nw",image=text_cover,tag="cover")
+
+    def rewrite_text(self,val1,val2):
+        self.my_canvas[InfoBar.TEXT].itemconfig("bigtext",text=val1)
+        self.my_canvas[InfoBar.TEXT].itemconfig("smalltext",text=val2)
 
     def populate_hpmp_canvas(self):
         global msg_hp, msg_mp

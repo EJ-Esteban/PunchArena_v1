@@ -28,7 +28,7 @@ class Game:
         #create state machine core
         self.my_state = StateCore()
         #create message core
-        self.my_msg = MessageCore()
+        self.my_msg = MessageCore(self.my_state)
         #create time core (animation, state machine update)
         self.my_time = TimeCore(master,self.my_state,self.my_msg)
         #setup canvases
@@ -41,6 +41,8 @@ class Game:
         statbar_frame.pack()
         self.statbar=StatBar(statbar_frame,self.my_time,self.my_msg, self.player1)
 
+        self.hover_box = self.statbar.get_hover()
+        self.my_msg.register_hoverbox(self.hover_box)
 
         #bind listeners
         master.bind("<space>",GameInput.space_detect)
@@ -129,11 +131,16 @@ class StateCore:
         self.state = 'endgame'
 
 class MessageCore:
-    VENUES = ['console']
 
-    def __init__(self):
+    def __init__(self,state):
+        self.venues = ['console']
         self.tag_list = []
+        self.my_state = state
         self.messages = dict()
+
+    def register_hoverbox(self, box):
+        self.hover_box = box
+        self.venues.append('hover')
 
     def add_message_candidate(self,tag,packet):
         self.tag_list.append(tag)
@@ -145,23 +152,28 @@ class MessageCore:
 
     def elect_messages(self):
         winners = dict()
-        for venue in MessageCore.VENUES:
-            winners[venue] = ['','',-1,0,False] #blank packet
+        for venue in self.venues:
+            winners[venue] = [venue,'','',-1,0,False] #blank packet
             for tag in self.messages.keys():
                 if self.messages[tag][0] == venue:
                     try_packet = self.messages[tag]
-                    if try_packet[3] > winners[venue][2]:
+                    if try_packet[3] > winners[venue][3]:
                         winners[venue] = try_packet
         return winners
 
     def play_messages(self):
         messages = self.elect_messages()
-        if not (messages['console'][2] == -1): #eliminates blank messages
+
+        #plays leading console message
+        if not (messages['console'][3] == -1): #eliminates blank messages
             if (messages['console'][5] == False): #marks message as read to avoid unnecessary message echoing
                 print("------CONSOLE MESSAGE-------")
                 print(messages['console'][1] + ":")
                 print(messages['console'][2])
                 messages['console'][5] =True
+        if ('hover' in self.venues):
+            self.hover_box.rewrite_text(messages['hover'][1],messages['hover'][2])
+
 
 
 
@@ -174,7 +186,13 @@ class MessageCore:
 class GameInput:
 
     def key_detect(event):
-        print("detected " + event.char)
+        foo = event.char
+        if foo =='q':
+            game_object.player1.set_move(0)
+        elif foo =='w':
+            game_object.player1.set_move(1)
+        elif foo =='e':
+            game_object.player1.set_move(2)
 
     def space_detect(event):
         game_object.player1.cycle_move()
