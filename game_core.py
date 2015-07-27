@@ -24,7 +24,7 @@ class Game:
         game_object = self
         #setup window
         self.master = master
-        master.wm_title("Punching Arena v." + m_c.VERSION_NUMBER)
+        master.wm_title("Punch Arena v." + m_c.VERSION_NUMBER)
         #create state machine core
         self.my_state = StateCore()
         #create time core (animation, state machine update)

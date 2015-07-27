@@ -2,14 +2,14 @@ __author__ = 'Emilio'
 import tkinter as tk
 import myconstants as m_c
 from player_obj import Player
-from world_obj import World_map
 from pointbar import PointBar
 from bar_button import BarButton
+from info_bar import InfoBar
 
-hp_bar = PointBar()
-mp_bar = PointBar()
+hp_bar = None
+mp_bar = None
 buttons = [[None for i in range(4)] for j in range(2)]
-hover_frame = None
+hover_bar = None
 
 class StatBar:
     def __init__(self, master, my_time, player):
@@ -23,6 +23,10 @@ class StatBar:
 
         hover_frame = tk.Frame(master,bg="green",width=m_c.hover_w,height=m_c.hover_h,highlightthickness=0)
         hover_frame.grid(row=0,column=7,rowspan=2)
+
+        global hover_bar
+        hover_bar = InfoBar(hover_frame,my_time)
+
 
     def make_mid_buttons(self):
         button_canvas = [[None for j in range(4)] for i in range(2)]
@@ -57,12 +61,15 @@ class StatBar:
 
     def make_hpmp_bars(self):
         #HP Bar
+        global hp_bar,mp_bar
+        hp_bar = PointBar("playerHP",self.my_time)
         hpcanvas = tk.Canvas(self.master, bg='pink', width=m_c.bar_w, height=m_c.bar_h, highlightthickness=0)
         hp_bar.attach_canvas(hpcanvas)
         hp_bar.create_bar_image()
         hpcanvas.grid(row=0, column=0)
         #MP Bar
         mpcanvas = tk.Canvas(self.master, bg='pink', width=m_c.bar_w, height=m_c.bar_h, highlightthickness=0)
+        mp_bar = PointBar("playerMP",self.my_time)
         mp_bar.attach_canvas(mpcanvas)
         mp_bar.create_bar_image()
         mpcanvas.grid(row=1, column=0)
