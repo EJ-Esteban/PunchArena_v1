@@ -26,7 +26,7 @@ class InfoBar(ProtoAnim):
         global text_cover
         text_cover = tk.PhotoImage(file = './images/statbar/hovercover.gif')
 
-        self.my_canvas[InfoBar.TEXT].create_text(15,10, anchor="nw",text="asdf",tag="bigtext",font="helvetica 12 bold", width = 120)
+        self.my_canvas[InfoBar.TEXT].create_text(15,12, anchor="nw",text="asdf",tag="bigtext",font="helvetica 12 bold", width = 120)
         self.my_canvas[InfoBar.TEXT].create_text(15,30, anchor="nw",text="asdf",tag="smalltext",font="helvetica 9 italic", width = 120)
 
         self.my_canvas[InfoBar.TEXT].create_image(0,0, anchor="nw",image=text_cover,tag="cover")

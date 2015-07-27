@@ -55,6 +55,8 @@ class BarButton(ProtoAnim):
         self.msg_tag = self.name
         self.my_canvas.bind("<Enter>", self.hover_in)
         self.my_canvas.bind("<Leave>", self.hover_out)
+        self.my_canvas.bind("<ButtonRelease-1>", self.button_clicked)
+
 
     def add_button_description(self,big,little):
         self.bigtext = big
@@ -68,4 +70,7 @@ class BarButton(ProtoAnim):
     def hover_out(self,event):
         self.mousedover = False
         self.msg_pipe.remove_message_candidate(self.msg_tag)
+
+    def button_clicked(self,event):
+        self.player.set_move(self.mode)
 

@@ -184,7 +184,6 @@ class MessageCore:
 
 
 class GameInput:
-
     def key_detect(event):
         foo = event.char
         if foo =='q':

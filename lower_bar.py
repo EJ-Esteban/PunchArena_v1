@@ -50,7 +50,7 @@ class StatBar:
         buttons[0][1].register_object()
         buttons[0][1].register_move(self.my_player,Player.BLOCK)
         buttons[0][1].attach_message_core(self.my_msg)
-        buttons[0][1].add_button_description("Block (W)","Brace in a direction to reduce injuries")
+        buttons[0][1].add_button_description("Block (W)","Brace yourself to reduce injuries from a certain direction")
 
         buttons[0][2].replace_image("punchButton")
         buttons[0][2].register_object()
