@@ -8,8 +8,9 @@ CONSOLE = m_c.MASTER_CONSOLE & m_c.WORLD_CONSOLE
 map_tiles = [[0 for y in range(12)] for x in range(8)]
 
 class World_map:
-    def __init__(self,my_time, my_canvas, worldName = 'kf'):
+    def __init__(self,my_time, my_msg, my_canvas,  worldName = 'kf'):
         self.my_time = my_time
+        self.my_msg = my_msg
         self.my_canvas = my_canvas
         self.load_world(worldName)
 
@@ -31,6 +32,7 @@ class World_map:
                 map_tiles[y][x] = mapTile(x,y,self.my_time)
                 map_tiles[y][x].attach_canvas(self.my_canvas)
                 map_tiles[y][x].create_tile(self.mapData[y][x])
+                map_tiles[y][x].attach_message_core(self.my_msg)
 
     def can_walk_tile(self,x,y):
         return self.mapData[y][x] in wd.WALKABLE_TILES
@@ -109,3 +111,14 @@ class mapTile(ProtoAnim):
         self.my_canvas.itemconfig(self.name,image = self.images[self.anim_frame])
         self.tick = 0
 
+    def bind_listeners(self):
+        self.msg_tag = self.name
+        self.my_canvas.tag_bind(self.name,"<Enter>", self.hover_in)
+        self.my_canvas.tag_bind(self.name,"<Leave>", self.hover_out)
+
+    def hover_in(self,event):
+        self.msg_packet = ['console',self.info_tuple[0],self.info_tuple[2],m_c.PRIO_HOVER_BACK,0,False]
+        self.msg_pipe.add_message_candidate(self.msg_tag,self.msg_packet)
+
+    def hover_out(self,event):
+        self.msg_pipe.remove_message_candidate(self.msg_tag)

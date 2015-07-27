@@ -27,9 +27,6 @@ class InfoBar(ProtoAnim):
         text_cover = tk.PhotoImage(file = './images/statbar/hovercover.gif')
         self.my_canvas[InfoBar.TEXT].create_image(0,0, anchor="nw",image=text_cover,tag="cover")
 
-
-
-
     def populate_hpmp_canvas(self):
         global msg_hp, msg_mp
         msg_hp = PointBar("msgHP", self.my_time)
@@ -68,6 +65,5 @@ class InfoBar(ProtoAnim):
     def animate(self):
         self.activate_canvas((self.active_canvas + 1)%2)
         self.tick = 0
-
 
 

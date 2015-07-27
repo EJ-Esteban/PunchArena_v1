@@ -147,3 +147,14 @@ class Player(ProtoAnim):
         self.my_canvas.update()
         self.tick = 0
 
+    def bind_listeners(self):
+        self.msg_tag = self.name
+        self.my_canvas.tag_bind(self.name,"<Enter>", self.hover_in)
+        self.my_canvas.tag_bind(self.name,"<Leave>", self.hover_out)
+
+    def hover_in(self,event):
+        self.msg_packet = ['console','player','hey that\'s you!',m_c.PRIO_HOVER_FORE,0,False]
+        self.msg_pipe.add_message_candidate(self.msg_tag,self.msg_packet)
+
+    def hover_out(self,event):
+        self.msg_pipe.remove_message_candidate(self.msg_tag)

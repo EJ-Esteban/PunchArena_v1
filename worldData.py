@@ -23,46 +23,46 @@ BIGGEST_TILE_VAL = OBSIDIAN #flag for biggest value to check for errors
 #tile library--binds tile name to image file(s), frame delay
 TILE_LIB = dict()
 TILE_LIB[ERROR] = (
-    "error", "err", "What is this tile even?!",
+    "Error", "err", "What is this tile even?!",
     1 , 0)
 TILE_LIB[FLOOR] = (
-    "floor", "floor", "A boring empty floor tile",
+    "Floor", "floor", "A boring empty floor tile",
     1 , 0)
 TILE_LIB[WALL] = (
-    "wall", "wall", "An indestructible titanium wall",
+    "Wall", "wall", "An indestructible titanium wall",
     1 , 0)
 TILE_LIB[PLEXIGLASS] = (
-    "plexiglass", "window", "An indestructible plexiglass window",
+    "Plexiglass", "window", "An indestructible plexiglass window",
     1 , 0)
 TILE_LIB[SAND] = (
-    "sand", "sand", "Huh. Someone dumped sand all over this tile.",
+    "Sand", "sand", "Huh. Someone dumped sand all over this tile.",
     1 , 0)
 TILE_LIB[WOOD] = (
-    "crate", "woodc", "A relatively sturdy wooden crate.",
+    "Crate", "woodc", "A relatively sturdy wooden crate.",
     1 , 0)
 TILE_LIB[WOOD_CRACKED] = (
-    "crate", "woodb", "This wooden crate is cracked.",
+    "Crate", "woodb", "This wooden crate is cracked.",
     1 , 0)
 TILE_LIB[WOOD_MISSING] = (
-    "floor", "wooda", "There are a bunch of splinters on the floor!",
+    "Floor", "wooda", "There are a bunch of splinters on the floor!",
     1 , 0)
 TILE_LIB[GLASS] = (
-    "glass", "glassc", "A relatively sturdy glass window.",
+    "Glass", "glassc", "A relatively sturdy glass window.",
     1 , 0)
 TILE_LIB[GLASS_CRACKED] = (
-    "glass", "glassb", "This glass window is cracked.",
+    "Glass", "glassb", "This glass window is cracked.",
     1 , 0)
 TILE_LIB[GLASS_MISSING] = (
-    "floor", "glassa", "There are a bunch of glass shards on te floor!.",
+    "Floor", "glassa", "There are a bunch of glass shards on te floor!.",
     1 , 0)
 TILE_LIB[LAVA] = (
-    "lava", "lava", "Only an idiot would try walking on lava.",
+    "Lava", "lava", "Only an idiot would try walking on lava.",
     2 , 15)
 TILE_LIB[WATER] = (
-    "water", "water", "You can't swim. Fortunately, this water's like 2 inches deep.",
+    "Water", "water", "You can't swim. Fortunately, this water's like 2 inches deep.",
     2 , 10)
 TILE_LIB[OBSIDIAN] = (
-    "obsidian floor", "obs", "A solid rock floor, but pretty boring all told.",
+    "Obsidian floor", "obs", "A solid rock floor, but pretty boring all told.",
     1 , 0)
 
 

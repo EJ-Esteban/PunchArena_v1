@@ -38,6 +38,15 @@ EAST = 1
 SOUTH = 2
 WEST = 3
 
+
+#message priorities
+PRIO_TOP = 5 #absolute top (
+PRIO_MSG_FREEZE = 4 #freezingf message (notifications, etc.)
+PRIO_HOVER_FORE = 3 #hover 1 (hovering over a player)
+PRIO_HOVER_BACK = 2 #hover 2 (hovering over a map tile, command)
+PRIO_NOTHING_SP = 1 #generic uninteresting messages
+
+
 #pathing
 img_path = "./images/map/tile_"
 sprite_path = "./images/sprites/"

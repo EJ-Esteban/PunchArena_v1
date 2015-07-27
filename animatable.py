@@ -30,3 +30,14 @@ class ProtoAnim:
         #blank method, generally forces a redraw for object
         pass
 
+    def attach_message_core(self,msg_pipe):
+        self.msg_tag = "blank"
+        self.msg_packet = ["console", "bigtext","smalltext",1,0,False]
+        self.msg_pipe = msg_pipe
+        self.bind_listeners()
+
+    def bind_listeners(self):
+        #blank method, use it to bind specific listener messages
+        pass
+
+

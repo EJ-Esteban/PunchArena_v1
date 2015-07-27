@@ -12,8 +12,9 @@ buttons = [[None for i in range(4)] for j in range(2)]
 hover_bar = None
 
 class StatBar:
-    def __init__(self, master, my_time, player):
+    def __init__(self, master, my_time, my_msg, player):
         self.master = master
+        self.my_msg = my_msg
         self.my_time = my_time
         self.my_player = player
 
@@ -41,12 +42,17 @@ class StatBar:
         buttons[0][0].replace_image("moveButton")
         buttons[0][0].register_object()
         buttons[0][0].register_move(self.my_player,Player.WALK)
+        buttons[0][0].attach_message_core(self.my_msg)
+
         buttons[0][1].replace_image("blockButton")
         buttons[0][1].register_object()
         buttons[0][1].register_move(self.my_player,Player.BLOCK)
+        buttons[0][1].attach_message_core(self.my_msg)
+
         buttons[0][2].replace_image("punchButton")
         buttons[0][2].register_object()
         buttons[0][2].register_move(self.my_player,Player.PUNCH)
+        buttons[0][2].attach_message_core(self.my_msg)
 
     def make_spacers(self):
         self.fill_wall = tk.PhotoImage(file="./images/statbar/filler.gif")

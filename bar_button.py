@@ -41,3 +41,15 @@ class BarButton(ProtoAnim):
     def animate_tick(self):
         self.replace_cover(self.player.check_mode()==self.mode)
 
+    def bind_listeners(self):
+        self.msg_tag = self.name
+        self.my_canvas.bind("<Enter>", self.hover_in)
+        self.my_canvas.bind("<Leave>", self.hover_out)
+
+    def hover_in(self,event):
+        self.msg_packet = ['console',self.name,'button!',m_c.PRIO_TOP,0,False]
+        self.msg_pipe.add_message_candidate(self.msg_tag,self.msg_packet)
+
+    def hover_out(self,event):
+        self.msg_pipe.remove_message_candidate(self.msg_tag)
+
