@@ -12,11 +12,11 @@ HIGH_MOVE = PUNCH
 # (internal_name,
 # bigtext, smalltext)
 MOVELIST = dict()
-MOVELIST[WALK] = ('walk',
+MOVELIST[WALK] = ('walk', 'movebutton',
                   'Move (Q)', "Walk around the tiles, all fancy-like")
-MOVELIST[BLOCK] = ('block',
+MOVELIST[BLOCK] = ('block', 'blockbutton',
                    "Block (W)", "Brace yourself to reduce injuries from a certain direction")
-MOVELIST[PUNCH] = ('punch',
+MOVELIST[PUNCH] = ('punch', 'punchbutton',
                    "Punch (E)", "Agress enemies and map tiles")
 
 VALID_EFFECTS = dict()

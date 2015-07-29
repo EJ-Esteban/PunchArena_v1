@@ -9,7 +9,7 @@ class PlayerAilmentsBar(ProtoAnim):
         self.master = master
         ProtoAnim.__init__(self, "PlayerFX", time_core)
         self.attach_canvas()
-        self.cover = tk.PhotoImage(file="./images/statbar/FXCover.gif")
+        self.cover = tk.PhotoImage(file="./images/statbar/playerFXCover.gif")
         self.my_canvas.create_image(0, 0, anchor=m_c.anchor, image=self.cover, tag="cover")
         self.player = player
 
