@@ -4,7 +4,6 @@ from animatable import ProtoAnim
 
 CONSOLE = m_c.MASTER_CONSOLE & m_c.PLAYER_CONSOLE
 
-
 # player object containing data relevant to both computer and human players
 
 class Player(ProtoAnim):
@@ -28,6 +27,7 @@ class Player(ProtoAnim):
         self.x = self.y = 0
         self.next_x = self.next_y = 0
 
+
     def attach_canvas(self, canvas=None):
         # players should attach to world canvas
         self.my_canvas = canvas
@@ -39,8 +39,7 @@ class Player(ProtoAnim):
         self.x = x
         self.y = y
         if CONSOLE:
-            print("placing player \"" + self.name + "\"")
-            print("x: " + str(self.x), "\ty: " + str(self.y))
+            self.send_to_console("moving player \"" + self.name + "\"","x: " + str(self.x) +"\ty: " + str(self.y))
         self.my_canvas.coords(self.name, self.x * 50, self.y * 50)
         self.my_canvas.update()
 
@@ -55,7 +54,7 @@ class Player(ProtoAnim):
     def load_tiles(self):
         """loads images into animation array"""
         if CONSOLE:
-            print("loading player sprites....")
+            self.send_to_console("loading player sprites....")
         self.animArray = [[None for i in range(3)] for j in range(4)]
         # "bob" (generic protagonist) sprites
         for c in range(3):
@@ -74,12 +73,12 @@ class Player(ProtoAnim):
         self.mode += 1
         self.mode %= Player.HIGH_MOVE + 1
         if CONSOLE:
-            print("queued move type " + str(self.mode))
+            self.send_to_console("queued move type " + str(self.mode))
 
     def set_move(self, num):
         self.mode = num
         if CONSOLE:
-            print("queued move type " + str(self.mode))
+            self.send_to_console("queued move type " + str(self.mode))
 
     def is_turn(self):
         return self.game_state.player_can_move(1)
@@ -146,8 +145,6 @@ class Player(ProtoAnim):
 
     def animate(self):
         """take action on animatino"""
-        if CONSOLE:
-            print("animating " + self.name)
         self.my_canvas.itemconfig(self.name, image=self.animArray[self.facing][self.anim_frame])
         self.anim_frame += 1  # advance frame
         self.anim_frame %= 2  # basic walk cycle is the first 2 things, and we always go back to basic walk cycle
@@ -160,7 +157,7 @@ class Player(ProtoAnim):
         self.my_canvas.tag_bind(self.name, "<Leave>", self.hover_out)
 
     def hover_in(self, event):
-        self.msg_packet = ['hover', 'player', 'hey that\'s you!', m_c.PRIO_HOVER_FORE, 0, False]
+        self.msg_packet = ['hover', 'player', 'hey that\'s you!', m_c.PRIO_HOVER_FORE, -1, False]
         self.msg_pipe.add_message_candidate(self.msg_tag, self.msg_packet)
 
     def hover_out(self, event):

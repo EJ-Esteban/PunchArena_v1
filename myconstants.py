@@ -1,11 +1,15 @@
 import tkinter
 
 # basic stuff
-VERSION_NUMBER = "1.0"
+VERSION_NUMBER = "0.1.1"
 
 # console settings
-MASTER_CONSOLE = False
+CONSOLE_WINDOW_ENABLED = True
+
+MASTER_CONSOLE = True
+#player feedback
 PLAYER_CONSOLE = True
+#world feedback
 WORLD_CONSOLE = True
 
 

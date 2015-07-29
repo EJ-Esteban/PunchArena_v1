@@ -10,48 +10,39 @@ from lower_bar import StatBar
 from threading import Semaphore
 
 game_object = None
-
-
-# worldname = "tt" #tile test
-# worldname = "kf" #killing floor
-# worldname = "ev" #empty void
-# worldname = "so" #shootout
-# world = World_map(worldname)
+game_console = None
 
 class Game:
     def __init__(self, master):
         global game_object
         game_object = self
-        # setup window
-        self.master = master
-        master.wm_title("Punch Arena v." + m_c.VERSION_NUMBER)
+        self.launch_game_cores(master)
+        self.launch_game_graphics(master,'tt')
+        self.launch_game_listeners(master)
+        self.my_time.start_game_ticks()
+
+    def launch_game_cores(self, master):
         # create state machine core
         self.my_state = StateCore()
         # create message core
         self.my_msg = MessageCore(self.my_state)
         # create time core (animation, state machine update)
         self.my_time = TimeCore(master, self.my_state, self.my_msg)
+
+    def launch_game_graphics(self, master,arena ='tt'):
+        # setup window
+        self.master = master
+        master.wm_title("Punch Arena v." + m_c.VERSION_NUMBER)
         # setup canvases
         map_canvas = tk.Canvas(master, bg='pink', width=m_c.canvas_w, height=m_c.canvas_h1, highlightthickness=0)
         map_canvas.pack()
-        self.game_arena = World_map(self.my_time, self.my_msg, map_canvas, 'tt')
+        self.game_arena = World_map(self.my_time, self.my_msg, map_canvas, arena)
         self.place_player_char(map_canvas)
-
         statbar_frame = tk.Frame(master, bg='red', width=m_c.canvas_w, height=m_c.canvas_h2, highlightthickness=0)
         statbar_frame.pack()
         self.statbar = StatBar(statbar_frame, self.my_time, self.my_msg, self.player1)
-
         self.hover_box = self.statbar.get_hover()
         self.my_msg.register_hoverbox(self.hover_box)
-
-        # bind listeners
-        master.bind("<space>", GameInput.space_detect)
-        master.bind('<Left>', GameInput.leftKey)
-        master.bind('<Right>', GameInput.rightKey)
-        master.bind('<Up>', GameInput.upKey)
-        master.bind('<Down>', GameInput.downKey)
-        master.bind('<KeyPress>', GameInput.key_detect)
-        self.my_time.start_game_ticks()
 
     def place_player_char(self, map_canvas):
         # create player
@@ -65,6 +56,19 @@ class Game:
         self.player1.attach_worldmap(self.game_arena)
         self.player1.attach_message_core(self.my_msg)
         self.player1.set_coords(self.game_arena.playerPos[0], self.game_arena.playerPos[1])
+
+    def launch_game_listeners(self, master):
+        # bind listeners
+        master.bind("<space>", GameInput.space_detect)
+        master.bind('<Left>', GameInput.leftKey)
+        master.bind('<Right>', GameInput.rightKey)
+        master.bind('<Up>', GameInput.upKey)
+        master.bind('<Down>', GameInput.downKey)
+        master.bind('<KeyPress>', GameInput.key_detect)
+
+    def attach_console(self,console):
+        global game_console
+        game_console = console
 
 
 class TimeCore:
@@ -149,11 +153,14 @@ class MessageCore:
         self.messages[tag] = packet
 
     def remove_message_candidate(self, tag):
-        self.tag_list.remove(tag)
-        del self.messages[tag]
+        if tag in self.tag_list:
+            self.tag_list.remove(tag)
+        if tag in self.messages.keys():
+            del self.messages[tag]
 
     def elect_messages(self):
         winners = dict()
+        winningtag = dict()
         for venue in self.venues:
             winners[venue] = [venue, '', '', -1, 0, False]  # blank packet
             for tag in self.messages.keys():
@@ -161,18 +168,22 @@ class MessageCore:
                     try_packet = self.messages[tag]
                     if try_packet[3] > winners[venue][3]:
                         winners[venue] = try_packet
-        return winners
+                winningtag[venue]=tag
+        return winners,winningtag
 
     def play_messages(self):
-        messages = self.elect_messages()
+        messages,tags = self.elect_messages()
 
         # plays leading console message
         if not (messages['console'][3] == -1):  # eliminates blank messages
-            if (messages['console'][5] == False):  # marks message as read to avoid unnecessary message echoing
-                print("------CONSOLE MESSAGE-------")
-                print(messages['console'][1] + ":")
-                print(messages['console'][2])
-                messages['console'][5] = True
+            consoletext ="------CONSOLE MESSAGE-------"
+            consoletext += "\n" + messages['console'][1] + ":"
+            consoletext += "\n" + messages['console'][2]
+            if game_console: #prints to console window if console it attached
+                game_console.print(consoletext)
+            else:
+                print(consoletext)
+            self.remove_message_candidate(tags['console'])
         if ('hover' in self.venues):
             self.hover_box.rewrite_text(messages['hover'][1], messages['hover'][2])
 

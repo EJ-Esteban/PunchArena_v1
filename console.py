@@ -8,7 +8,7 @@ from difflib import SequenceMatcher
 class ConsoleWindow:
     # these functions are not considered for spell checking
     INTERNAL_FUNCTIONS = ["print", "find_match", "__init__", "resolve_cmd",
-                          "send_cmd", "go_up", "go_down"]
+                          "send_cmd", "go_up", "go_down","attach_game"]
     MATCH_THRESH = .6
     HR = "------------------------------"
 
@@ -39,7 +39,12 @@ class ConsoleWindow:
         self.cmdline.bind("<Up>", self.go_up)
         self.cmdline.bind("<Down>", self.go_down)
 
+        self.game = None
         self.function_list = [x for x, y in ConsoleWindow.__dict__.items() if type(y) == FunctionType]
+
+    def attach_game(self,game):
+        self.game = game
+        game.attach_console(self)
 
     def print(self, message):
         self.text.config(state="normal")
@@ -121,11 +126,11 @@ class ConsoleWindow:
             self.print("okay, seriously, you're asking for help with the help function????")
         else:
             if hasattr(self, items):
-                self.print("")
                 getattr(self, items)("@givehelp")
             else:
                 self.print("ERROR: \"" + items + "\" not recognized.")
                 self.find_match(items)
+            self.print("")
 
     def clear(self, items):
         """clears the console"""

@@ -10,7 +10,6 @@ hp_bar = None
 mp_bar = None
 buttons = [[None for i in range(4)] for j in range(2)]
 
-
 class StatBar:
     def __init__(self, master, my_time, my_msg, player):
         self.master = master
