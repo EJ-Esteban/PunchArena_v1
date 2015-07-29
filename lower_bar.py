@@ -7,7 +7,7 @@ from bar_button import BarButton
 from info_bar import InfoBar
 from player_ailments_bar import PlayerAilmentsBar
 
-import playerData as pd 
+import playerData as pd
 
 hp_bar = None
 mp_bar = None
@@ -44,23 +44,13 @@ class StatBar:
                 button_canvas[i][j].grid(row=1 + i, column=2 + j)
 
         # special buttons
-        buttons[0][0].replace_image("moveButton")
-        buttons[0][0].register_object()
-        buttons[0][0].register_move(self.my_player, pd.WALK)
-        buttons[0][0].attach_message_core(self.my_msg)
-        buttons[0][0].add_button_description("Move (Q)", "Walk around the tiles, all fancy-like")
+        for x in range(3):
+            buttons[0][x].replace_image(pd.MOVELIST[x][1])
+            buttons[0][x].register_object()
+            buttons[0][x].register_move(self.my_player, x)
+            buttons[0][x].attach_message_core(self.my_msg)
+            buttons[0][x].add_button_description(pd.MOVELIST[x][2], pd.MOVELIST[x][3])
 
-        buttons[0][1].replace_image("blockButton")
-        buttons[0][1].register_object()
-        buttons[0][1].register_move(self.my_player, pd.BLOCK)
-        buttons[0][1].attach_message_core(self.my_msg)
-        buttons[0][1].add_button_description("Block (W)", "Brace yourself to reduce injuries from a certain direction")
-
-        buttons[0][2].replace_image("punchButton")
-        buttons[0][2].register_object()
-        buttons[0][2].register_move(self.my_player, pd.PUNCH)
-        buttons[0][2].attach_message_core(self.my_msg)
-        buttons[0][2].add_button_description("Punch (E)", "Agress enemies and map tiles")
 
     def make_spacers(self):
         self.fill_wall = tk.PhotoImage(file="./images/statbar/filler.gif")
