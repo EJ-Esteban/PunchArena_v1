@@ -67,21 +67,21 @@ TILE_LIB[LAVA] = (
     "Lava", "lava", "Only an idiot would try walking on lava.",
     2, 15)
 TILE_LIB[PUDDLE] = (
-    "Puddle", "puddle", "You're a terrible swimmer. Fortunately, this water's like 2 inches deep.",
+    "Puddle", "puddle", "You're a terrible swimmer, but this water's only like 2 inches deep.",
     1, 0)
 TILE_LIB[WATER] = (
     "Water", "water", "You're a terrible swimmer. Might wanna stay out of this one.",
     4, 5)
 TILE_LIB[OBSIDIAN] = (
-    "Obsidian floor", "obs", "A solid rock floor, but pretty boring all told.",
+    "Obsidian", "obs", "A solid rock floor, but pretty boring all told.",
     1, 0)
 
 # data on what can be walked, shot through, broken
 # these floors can be passed
 WALKABLE_TILES = (FLOOR, SAND, WOOD_MISSING, GLASS_MISSING, LAVA, PUDDLE, WATER, OBSIDIAN)
-PROJECTILE_TILES = (FLOOR, PLEXIGLASS, GLASS, GLASS_CRACKED, GLASS_CRACKED, WOOD_MISSING, LAVA, WATER, OBSIDIAN)
+PROJECTILE_TILES = (FLOOR, PLEXIGLASS, GLASS, GLASS_CRACKED, GLASS_CRACKED, WOOD_MISSING, LAVA, WATER, PUDDLE, OBSIDIAN)
 BREAKABLE_TILES = (WOOD, WOOD_CRACKED, GLASS, GLASS_CRACKED, ERROR)
-SPECIAL_TILES = (LAVA, PUDDLE, WATER)
+SPECIAL_TILES = (LAVA, PUDDLE, WATER, SAND, FLOOR, GLASS_MISSING, WOOD_MISSING)
 
 
 # breakables dictionary tells what comes next when something breaks
@@ -119,12 +119,12 @@ tt = dict()
 tt['name'] = "tile test"
 tt['map'] = [
     [0, 1, 2, 0, 0, 0, 4, 0, 7, 0, 0, 0],
-    [0, 3, 13, 0, 0, 0, 5, 0, 8, 0, 0, 0],
+    [0, 0, 13, 0, 0, 0, 5, 0, 8, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 6, 0, 9, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 11, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 10, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -1],
 ]
 tt['player'] = [3, 3]

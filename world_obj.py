@@ -4,7 +4,8 @@ import worldData as wd
 import myconstants as m_c
 from animatable import ProtoAnim
 
-CONSOLE = m_c.MASTER_CONSOLE & m_c.WORLD_CONSOLE
+from player_obj import Player
+
 map_tiles = [[0 for y in range(12)] for x in range(8)]
 
 
@@ -51,9 +52,71 @@ class World_map:
             return map_tiles[y][x].info_tuple[0]
         return ""
 
+    def service_special_tile(self, variant, obj):
+        variant = variant.lower()
+        getattr(self, "service_" + variant)(obj)
+
+    def service_lava(self, obj=None):
+        if type(obj) is Player:
+            x = obj.x
+            y = obj.y
+            if obj.has_effect("wetfeet"):
+                self.mapData[y][x] = wd.OBSIDIAN
+                map_tiles[y][x].repaint_tile(wd.OBSIDIAN)
+                map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
+                obj.rm_effect("wetfeet")
+                obj.rm_effect("dampfeet")
+                map_tiles[y][x].send_to_console(obj.name + " cooled the lava without incident.", val=2)
+            elif obj.has_effect("dampfeet"):
+                self.mapData[y][x] = wd.OBSIDIAN
+                map_tiles[y][x].repaint_tile(wd.OBSIDIAN)
+                map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
+                obj.rm_effect("dampfeet")
+                map_tiles[y][x].send_to_console(obj.name + " cooled the lava but was singed.", val=2)
+            else:
+                map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
+            obj.add_effect("hotfeet")
+
+    def service_water(self, obj=None):
+        if type(obj) is Player:
+            obj.add_effect("wetfeet")
+            obj.rm_effect("hotfeet")
+            obj.rm_effect("dampfeet")
+
+    def service_puddle(self, obj=None):
+        if type(obj) is Player:
+            if obj.has_effect("hotfeet"):
+                x = obj.x
+                y = obj.y
+                self.mapData[y][x] = wd.FLOOR
+                map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
+                map_tiles[y][x].repaint_tile(wd.FLOOR)
+                obj.rm_effect("hotfeet")
+            elif obj.has_effect("wetfeet"):
+                pass
+            else:
+                obj.add_effect("dampfeet")
+
+    def service_sand(self, obj=None):
+        if type(obj) is Player:
+            obj.rm_effect("wetfeet")
+            obj.rm_effect("hotfeet")
+            obj.rm_effect("dampfeet")
+
+    def service_floor(self, obj=None):
+        if type(obj) is Player:
+            if obj.has_effect("wetfeet"):
+                x = obj.x
+                y = obj.y
+                self.mapData[y][x] = wd.PUDDLE
+                map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "plop!\n", val=2)
+                map_tiles[y][x].repaint_tile(wd.PUDDLE)
+                obj.rm_effect("wetfeet")
+
+
 class mapTile(ProtoAnim):
     """the animated part of a tile--image frames and whatnot"""
-
+    CONSOLE_DETAIL = m_c.WORLD_CONSOLE_DETAIL
     def __init__(self, x, y, my_time):
         name = 'tile-' + str(x) + "-" + str(y)
         self.x = x

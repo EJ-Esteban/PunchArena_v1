@@ -1,6 +1,7 @@
 import myconstants as m_c
 
 class ProtoAnim:
+    CONSOLE_DETAIL = -1
     def __init__(self, name, my_time):
         # all animated objects need a name (string) and time core (for animation)
         self.name = name
@@ -42,12 +43,16 @@ class ProtoAnim:
         # blank method, use it to bind specific listener messages
         pass
 
-    def send_to_console(self,text1,text2=""):
+    def console_ready(self, val):
+        return m_c.MASTER_CONSOLE and val <= self.CONSOLE_DETAIL
+
+    def send_to_console(self, text1, text2="", val=5):
         #generic printable for console feedback
-        console_packet = ['console', text1, text2, m_c.PRIO_TOP, 0, False]
-        self.console_count += 1
-        if hasattr(self,'msg_pipe'):
-            self.msg_pipe.add_message_candidate(self.msg_tag + str(self.console_count), console_packet)
-        else:
-            print(text1)
-            print(text2)
+        if self.console_ready(val):
+            console_packet = ['console', text1, text2, m_c.PRIO_TOP, 0, False]
+            self.console_count += 1
+            if hasattr(self, 'msg_pipe'):
+                self.msg_pipe.add_message_candidate(self.msg_tag + "_Cmsg_" + str(self.console_count), console_packet)
+            else:
+                print(text1)
+                print(text2)

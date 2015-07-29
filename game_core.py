@@ -167,8 +167,8 @@ class MessageCore:
                 if self.messages[tag][0] == venue:
                     try_packet = self.messages[tag]
                     if try_packet[3] > winners[venue][3]:
-                        winners[venue] = try_packet
-                winningtag[venue]=tag
+                        winners[venue] = self.messages[tag]
+                        winningtag[venue] = tag
         return winners,winningtag
 
     def play_messages(self):
@@ -176,14 +176,14 @@ class MessageCore:
 
         # plays leading console message
         if not (messages['console'][3] == -1):  # eliminates blank messages
-            consoletext ="------CONSOLE MESSAGE-------"
-            consoletext += "\n" + messages['console'][1]
+            consoletext = messages['console'][1]
             consoletext += "\n" + messages['console'][2]
             if game_console: #prints to console window if console it attached
                 game_console.print(consoletext)
             else:
                 print(consoletext)
             self.remove_message_candidate(tags['console'])
+        # redraws hover message
         if ('hover' in self.venues):
             self.hover_box.rewrite_text(messages['hover'][1], messages['hover'][2])
 

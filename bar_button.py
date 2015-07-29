@@ -4,7 +4,6 @@ import tkinter as tk
 import myconstants as m_c
 from animatable import ProtoAnim
 
-
 class BarButton(ProtoAnim):
     def __init__(self, name, time_core):
         ProtoAnim.__init__(self, name, time_core)
@@ -26,7 +25,9 @@ class BarButton(ProtoAnim):
 
     def replace_cover(self):
         # activate button if registered move is active
-        status = self.player.check_mode() == self.mode
+        status = False
+        if hasattr(self, "player"):
+            status = self.player.check_mode() == self.mode
         if status:
             if self.mousedover:
                 self.my_canvas.itemconfig("cover", image=self.cover_img3)
@@ -71,4 +72,5 @@ class BarButton(ProtoAnim):
         self.msg_pipe.remove_message_candidate(self.msg_tag)
 
     def button_clicked(self, event):
-        self.player.set_move(self.mode)
+        if hasattr(self, "player"):
+            self.player.set_move(self.mode)

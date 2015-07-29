@@ -5,11 +5,13 @@ from player_obj import pd
 from pointbar import PointBar
 from bar_button import BarButton
 from info_bar import InfoBar
+from player_ailments_bar import PlayerAilmentsBar
 
 import playerData as pd 
 
 hp_bar = None
 mp_bar = None
+playerFX = None
 buttons = [[None for i in range(4)] for j in range(2)]
 
 class StatBar:
@@ -24,9 +26,12 @@ class StatBar:
         self.make_mid_buttons()
 
         hover_frame = tk.Frame(master, bg="green", width=m_c.hover_w, height=m_c.hover_h, highlightthickness=0)
-        hover_frame.grid(row=0, column=7, rowspan=2)
+        hover_frame.grid(row=1, column=7, rowspan=2)
 
         self.hover_bar = InfoBar(hover_frame, my_time)
+        self.playerFX = PlayerAilmentsBar(master, my_time, player)
+        self.playerFX.attach_message_core(self.my_msg)
+        self.playerFX.register_object()
 
     def make_mid_buttons(self):
         button_canvas = [[None for j in range(4)] for i in range(2)]
@@ -36,7 +41,7 @@ class StatBar:
                                                 highlightthickness=0)
                 buttons[i][j] = BarButton("errorBlock", self.my_time)
                 buttons[i][j].attach_canvas(button_canvas[i][j])
-                button_canvas[i][j].grid(row=i, column=2 + j)
+                button_canvas[i][j].grid(row=1 + i, column=2 + j)
 
         # special buttons
         buttons[0][0].replace_image("moveButton")
@@ -61,12 +66,12 @@ class StatBar:
         self.fill_wall = tk.PhotoImage(file="./images/statbar/filler.gif")
         fill_canvas1 = tk.Canvas(self.master, bg="blue", width=m_c.button_w, height=m_c.button_h * 2,
                                  highlightthickness=0)
-        fill_canvas1.grid(row=0, column=1, rowspan=2)
+        fill_canvas1.grid(row=1, column=1, rowspan=2)
         fill_canvas1.create_image(0, 0, anchor=m_c.anchor, image=self.fill_wall)
         fill_canvas1.create_image(0, 50, anchor=m_c.anchor, image=self.fill_wall)
         fill_canvas2 = tk.Canvas(self.master, bg="blue", width=m_c.button_w, height=m_c.button_h * 2,
                                  highlightthickness=0)
-        fill_canvas2.grid(row=0, column=6, rowspan=2)
+        fill_canvas2.grid(row=1, column=6, rowspan=2)
         fill_canvas2.create_image(0, 0, anchor=m_c.anchor, image=self.fill_wall)
         fill_canvas2.create_image(0, 50, anchor=m_c.anchor, image=self.fill_wall)
 
@@ -77,13 +82,13 @@ class StatBar:
         hpcanvas = tk.Canvas(self.master, bg='pink', width=m_c.bar_w, height=m_c.bar_h, highlightthickness=0)
         hp_bar.attach_canvas(hpcanvas)
         hp_bar.create_bar_image()
-        hpcanvas.grid(row=0, column=0)
+        hpcanvas.grid(row=1, column=0)
         # MP Bar
         mpcanvas = tk.Canvas(self.master, bg='pink', width=m_c.bar_w, height=m_c.bar_h, highlightthickness=0)
         mp_bar = PointBar("playerMP", self.my_time)
         mp_bar.attach_canvas(mpcanvas)
         mp_bar.create_bar_image()
-        mpcanvas.grid(row=1, column=0)
+        mpcanvas.grid(row=2, column=0)
         mp_bar.recolor_bar("light blue", "blue")
         mp_bar.retype_bar("MP")
 
