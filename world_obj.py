@@ -46,6 +46,10 @@ class World_map:
         self.mapData[y][x] = new_type
         map_tiles[y][x].repaint_tile(new_type)
 
+    def tile_is_special(self, x, y):
+        if self.mapData[y][x] in wd.SPECIAL_TILES:
+            return map_tiles[y][x].info_tuple[0]
+        return ""
 
 class mapTile(ProtoAnim):
     """the animated part of a tile--image frames and whatnot"""

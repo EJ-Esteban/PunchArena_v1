@@ -8,6 +8,7 @@ class ProtoAnim:
         self.my_canvas = None
         self.anim_frame = 0
 
+        self.console_count = 0
         # animation ticks
         self.tick_til = 0
         self.tick = 0
@@ -44,8 +45,9 @@ class ProtoAnim:
     def send_to_console(self,text1,text2=""):
         #generic printable for console feedback
         console_packet = ['console', text1, text2, m_c.PRIO_TOP, 0, False]
+        self.console_count += 1
         if hasattr(self,'msg_pipe'):
-            self.msg_pipe.add_message_candidate(self.msg_tag, console_packet)
+            self.msg_pipe.add_message_candidate(self.msg_tag + str(self.console_count), console_packet)
         else:
             print(text1)
             print(text2)

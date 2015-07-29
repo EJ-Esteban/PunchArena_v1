@@ -1,10 +1,12 @@
 __author__ = 'Emilio'
 import tkinter as tk
 import myconstants as m_c
-from player_obj import Player
+from player_obj import pd
 from pointbar import PointBar
 from bar_button import BarButton
 from info_bar import InfoBar
+
+import playerData as pd 
 
 hp_bar = None
 mp_bar = None
@@ -39,19 +41,19 @@ class StatBar:
         # special buttons
         buttons[0][0].replace_image("moveButton")
         buttons[0][0].register_object()
-        buttons[0][0].register_move(self.my_player, Player.WALK)
+        buttons[0][0].register_move(self.my_player, pd.WALK)
         buttons[0][0].attach_message_core(self.my_msg)
-        buttons[0][0].add_button_description("Move (Q)", "walk around the tiles, all fancy-like")
+        buttons[0][0].add_button_description("Move (Q)", "Walk around the tiles, all fancy-like")
 
         buttons[0][1].replace_image("blockButton")
         buttons[0][1].register_object()
-        buttons[0][1].register_move(self.my_player, Player.BLOCK)
+        buttons[0][1].register_move(self.my_player, pd.BLOCK)
         buttons[0][1].attach_message_core(self.my_msg)
         buttons[0][1].add_button_description("Block (W)", "Brace yourself to reduce injuries from a certain direction")
 
         buttons[0][2].replace_image("punchButton")
         buttons[0][2].register_object()
-        buttons[0][2].register_move(self.my_player, Player.PUNCH)
+        buttons[0][2].register_move(self.my_player, pd.PUNCH)
         buttons[0][2].attach_message_core(self.my_msg)
         buttons[0][2].add_button_description("Punch (E)", "Agress enemies and map tiles")
 

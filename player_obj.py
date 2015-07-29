@@ -2,27 +2,19 @@ import tkinter as tk
 import myconstants as m_c
 from animatable import ProtoAnim
 
-CONSOLE = m_c.MASTER_CONSOLE & m_c.PLAYER_CONSOLE
+import playerData as pd
 
 # player object containing data relevant to both computer and human players
 
 class Player(ProtoAnim):
-    PLAYER_ANIM_DELAY = 6
-    PLAYER_ANIM_DELAY_LONG = 12
-
-    WALK = 0
-    BLOCK = 1
-    PUNCH = 2
-
-    HIGH_MOVE = PUNCH
 
     def __init__(self, name, my_time):
         ProtoAnim.__init__(self, name, my_time)
 
-        self.tick_til = Player.PLAYER_ANIM_DELAY
+        self.tick_til = pd.PLAYER_ANIM_DELAY
         self.facing = m_c.NORTH
 
-        self.mode = Player.WALK
+        self.mode = pd.WALK
 
         self.x = self.y = 0
         self.next_x = self.next_y = 0
@@ -38,7 +30,7 @@ class Player(ProtoAnim):
     def set_coords(self, x, y):
         self.x = x
         self.y = y
-        if CONSOLE:
+        if self.console_ready(4):
             self.send_to_console("moving player \"" + self.name + "\"","x: " + str(self.x) +"\ty: " + str(self.y))
         self.my_canvas.coords(self.name, self.x * 50, self.y * 50)
         self.my_canvas.update()
@@ -53,7 +45,7 @@ class Player(ProtoAnim):
 
     def load_tiles(self):
         """loads images into animation array"""
-        if CONSOLE:
+        if self.console_ready(2):
             self.send_to_console("loading player sprites....")
         self.animArray = [[None for i in range(3)] for j in range(4)]
         # "bob" (generic protagonist) sprites
@@ -71,22 +63,24 @@ class Player(ProtoAnim):
 
     def cycle_move(self):
         self.mode += 1
-        self.mode %= Player.HIGH_MOVE + 1
-        if CONSOLE:
-            self.send_to_console("queued move type " + str(self.mode))
+        self.mode %= pd.HIGH_MOVE + 1
+        if self.console_ready(2):
+            move = pd.MOVELIST[self.mode]
+            self.send_to_console("Queued move " + move[0])
 
     def set_move(self, num):
         self.mode = num
-        if CONSOLE:
-            self.send_to_console("queued move type " + str(self.mode))
+        if self.console_ready(2):
+            move = pd.MOVELIST[self.mode]
+            self.send_to_console("Queued move " + move[0])
 
     def is_turn(self):
         return self.game_state.player_can_move(1)
 
     def move_arrow(self, dir):
-        if self.mode == Player.PUNCH:
+        if self.mode == pd.PUNCH:
             self.punch(dir)
-        elif self.mode == Player.BLOCK:
+        elif self.mode == pd.BLOCK:
             pass
         else:  # walk mode
             self.move(dir)
@@ -104,10 +98,16 @@ class Player(ProtoAnim):
         else:
             dy = 1
         self.predict(dx, dy)
-        if self.my_world.can_break_tile(self.next_x, self.next_y):
+        punched = self.my_world.can_break_tile(self.next_x, self.next_y)
+        if punched:
             self.my_world.degrade_tile(self.next_x, self.next_y)
+        if self.console_ready(2):
+            s = ""
+            if punched:
+                s = "Broke a tile!"
+            self.send_to_console("punching tile at " + str(self.next_x) + "," + str(self.next_y), s)
         self.anim_frame = 2  # set to punch frame
-        self.tick_til = Player.PLAYER_ANIM_DELAY_LONG
+        self.tick_til = pd.PLAYER_ANIM_DELAY_LONG
         self.animate()
 
     def move(self, dir):
@@ -125,8 +125,20 @@ class Player(ProtoAnim):
         else:
             dy = 1
         self.predict(dx, dy)
-        if self.my_world.can_walk_tile(self.next_x, self.next_y):
+        col = self.my_world.can_walk_tile(self.next_x, self.next_y)
+        if col:
             self.set_coords(self.next_x, self.next_y)
+            spc = self.my_world.tile_is_special(self.x, self.y)
+        if self.console_ready(2):
+            s = "Path was "
+            if not col:
+                s += "blocked."
+            else:
+                s += "taken."
+                if not spc == "":
+                    s += "\n" + self.name + " walked onto special tile: " + spc
+            self.send_to_console("Trying to move to " + str(self.next_x) + "," + str(self.next_y), s)
+
         self.animate()
 
     def predict(self, dx, dy):
@@ -143,6 +155,9 @@ class Player(ProtoAnim):
         if (self.next_y > 7):
             self.next_y = 0
 
+    def console_ready(self, val):
+        return m_c.MASTER_CONSOLE and val <= m_c.PLAYER_CONSOLE_DETAIL
+
     def animate(self):
         """take action on animatino"""
         self.my_canvas.itemconfig(self.name, image=self.animArray[self.facing][self.anim_frame])
@@ -150,6 +165,8 @@ class Player(ProtoAnim):
         self.anim_frame %= 2  # basic walk cycle is the first 2 things, and we always go back to basic walk cycle
         self.my_canvas.update()
         self.tick = 0
+        if self.console_ready(5):
+            self.send_to_console("animating player")
 
     def bind_listeners(self):
         self.msg_tag = self.name

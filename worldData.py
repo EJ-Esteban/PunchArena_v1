@@ -15,12 +15,20 @@ GLASS = 7  # projectile, degrades to cracked glass
 GLASS_CRACKED = 8  # projectile, degrades to missing glass
 GLASS_MISSING = 9  # passable floor surrogate
 LAVA = 10  # LAVA BURNNSSSSSSS
-WATER = 11  # this is water
-OBSIDIAN = 12  # floor tile, probably a result of doing something with water and obsidian
+PUDDLE = 11  # this is a puddle
+WATER = 12  # water probably drowns you or whatever? maybe after 2 tiles
+OBSIDIAN = 13  # floor tile, probably a result of doing something with water and obsidian
 
 BIGGEST_TILE_VAL = OBSIDIAN  # flag for biggest value to check for errors
 
-# tile library--binds tile name to image file(s), frame delay
+"""
+tile library-for each element:
+[0]: display name (bigtext)
+[1]: internal name (images, special effect methods)
+[2]: display info (smalltext)
+[3]: frames ( >1 means tile is animated)
+[4]: frame delay (only relevant if animated)
+"""
 TILE_LIB = dict()
 TILE_LIB[ERROR] = (
     "Error", "err", "What is this tile even?!",
@@ -58,20 +66,22 @@ TILE_LIB[GLASS_MISSING] = (
 TILE_LIB[LAVA] = (
     "Lava", "lava", "Only an idiot would try walking on lava.",
     2, 15)
+TILE_LIB[PUDDLE] = (
+    "Puddle", "puddle", "You're a terrible swimmer. Fortunately, this water's like 2 inches deep.",
+    1, 0)
 TILE_LIB[WATER] = (
-    "Water", "water", "You can't swim. Fortunately, this water's like 2 inches deep.",
-    2, 10)
+    "Water", "water", "You're a terrible swimmer. Might wanna stay out of this one.",
+    4, 5)
 TILE_LIB[OBSIDIAN] = (
     "Obsidian floor", "obs", "A solid rock floor, but pretty boring all told.",
     1, 0)
 
-
 # data on what can be walked, shot through, broken
 # these floors can be passed
-WALKABLE_TILES = (FLOOR, SAND, WOOD_MISSING, GLASS_MISSING, LAVA, WATER, OBSIDIAN)
-PROJECTILE_TILES = (FLOOR, PLEXIGLASS, GLASS, GLASS_CRACKED, GLASS_CRACKED, WOOD_MISSING, LAVA, OBSIDIAN)
+WALKABLE_TILES = (FLOOR, SAND, WOOD_MISSING, GLASS_MISSING, LAVA, PUDDLE, WATER, OBSIDIAN)
+PROJECTILE_TILES = (FLOOR, PLEXIGLASS, GLASS, GLASS_CRACKED, GLASS_CRACKED, WOOD_MISSING, LAVA, WATER, OBSIDIAN)
 BREAKABLE_TILES = (WOOD, WOOD_CRACKED, GLASS, GLASS_CRACKED, ERROR)
-
+SPECIAL_TILES = (LAVA, PUDDLE, WATER)
 
 
 # breakables dictionary tells what comes next when something breaks
@@ -83,10 +93,10 @@ NEXT_BREAK[GLASS] = GLASS_CRACKED
 NEXT_BREAK[GLASS_CRACKED] = GLASS_MISSING
 NEXT_BREAK[ERROR] = FLOOR
 
-####################################################################################################
-# MAPS START HERE
-#
-####################################################################################################
+"""
+MAPS START HERE
+
+"""
 
 # empty void
 ev = dict()
@@ -108,13 +118,13 @@ ev['AI1'] = [7, 11]
 tt = dict()
 tt['name'] = "tile test"
 tt['map'] = [
-    [0, 0, 0, 0, 0, 0, 4, 0, 7, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 5, 0, 8, 0, 0, 0],
-    [0, 2, 0, 0, 0, 0, 6, 0, 9, 0, 0, 0],
-    [0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 2, 0, 0, 0, 4, 0, 7, 0, 0, 0],
+    [0, 3, 13, 0, 0, 0, 5, 0, 8, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 6, 0, 9, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 11, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -1],
 ]
 tt['player'] = [3, 3]

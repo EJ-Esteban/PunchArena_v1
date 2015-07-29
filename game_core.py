@@ -177,7 +177,7 @@ class MessageCore:
         # plays leading console message
         if not (messages['console'][3] == -1):  # eliminates blank messages
             consoletext ="------CONSOLE MESSAGE-------"
-            consoletext += "\n" + messages['console'][1] + ":"
+            consoletext += "\n" + messages['console'][1]
             consoletext += "\n" + messages['console'][2]
             if game_console: #prints to console window if console it attached
                 game_console.print(consoletext)
@@ -199,7 +199,8 @@ class GameInput:
             game_object.player1.set_move(2)
 
     def space_detect(event):
-        game_object.player1.cycle_move()
+        pass
+        # game_object.player1.cycle_move()
 
     def leftKey(event):
         GameInput.try_move(m_c.WEST)

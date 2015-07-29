@@ -7,8 +7,9 @@ VERSION_NUMBER = "0.1.1"
 CONSOLE_WINDOW_ENABLED = True
 
 MASTER_CONSOLE = True
+# detail levels range from 0 (off) to 5 (overly detailed)
 #player feedback
-PLAYER_CONSOLE = True
+PLAYER_CONSOLE_DETAIL = 2
 #world feedback
 WORLD_CONSOLE = True
 
