@@ -1,5 +1,6 @@
 import tkinter as tk
 import myconstants as m_c
+import worldData as wd
 
 from types import FunctionType
 from difflib import SequenceMatcher
@@ -8,7 +9,7 @@ from difflib import SequenceMatcher
 class ConsoleWindow:
     # these functions are not considered for spell checking
     INTERNAL_FUNCTIONS = ["print", "find_match", "__init__", "resolve_cmd",
-                          "send_cmd", "go_up", "go_down","attach_game"]
+                          "send_cmd", "go_up", "go_down", "attach_game"]
     MATCH_THRESH = .6
     HR = "------------------------------"
 
@@ -42,7 +43,7 @@ class ConsoleWindow:
         self.game = None
         self.function_list = [x for x, y in ConsoleWindow.__dict__.items() if type(y) == FunctionType]
 
-    def attach_game(self,game):
+    def attach_game(self, game):
         self.game = game
         game.attach_console(self)
 
@@ -67,7 +68,7 @@ class ConsoleWindow:
         foo = message.partition(' ')[0]
         foo = foo.lower()
         message = self.cmd.replace(foo + " ", "", 1)
-        self.print(foo + ":")
+        self.print(self.cmd + ":")
         if hasattr(self, foo) and (foo not in ConsoleWindow.INTERNAL_FUNCTIONS):
             getattr(self, foo)(message)
         else:
@@ -151,6 +152,36 @@ class ConsoleWindow:
             self.rewind_level = 0
             self.temp_cmd = ""
             self.clear("")
+
+    def retile(self, items):
+        if items == "@givehelp":
+            self.print("usage: retile x y variant" +
+                       "\nadds a tile to the world")
+        else:
+            try:
+                vals = items.split()
+                x = int(vals[0]) - 1
+                y = int(vals[1]) - 1
+                if x < 0 or x > 11 or y < 0 or y > 7:
+                    self.print("error-- coordinate out of bounds\n")
+                    return
+                s = vals[2]
+                if s.isdigit():
+                    var = int(s)
+                else:
+                    var = -2
+                    for i in range(wd.ERROR, wd.BIGGEST_TILE_VAL + 1):
+                        if s == wd.TILE_LIB[i][1]:
+                            var = i
+                    if var == -2:
+                        self.print("tile not recognized, placing error tile")
+                        var = -1
+                self.print("replacing (%i,%i), with tile of type %s\n" % (x, y, wd.TILE_LIB[var][1]))
+                self.game.debug_place_world_tile(x, y, var)
+            except IndexError:
+                self.print("error-- not enough arguments\n")
+            except ValueError:
+                self.print("error-- some arguments are not integers\n")
 
 
 if __name__ == "__main__":

@@ -68,13 +68,15 @@ class World_map:
 
     def service_floor(self, obj=None):
         if type(obj) is Player:
-            if obj.has_effect("wetfeet"):
-                x = obj.x
-                y = obj.y
-                self.mapData[y][x] = wd.PUDDLE
-                map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "plop!\n", val=2)
-                map_tiles[y][x].repaint_tile(wd.PUDDLE)
-                obj.rm_effect("wetfeet")
+            mode = obj.mode
+            if mode is pd.WALK:
+                if obj.has_effect("wetfeet"):
+                    x = obj.x
+                    y = obj.y
+                    self.mapData[y][x] = wd.PUDDLE
+                    map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "plop!\n", val=2)
+                    map_tiles[y][x].repaint_tile(wd.PUDDLE)
+                    obj.rm_effect("wetfeet")
 
     def service_wall(self, obj=None):
         if type(obj) is Player:
@@ -88,9 +90,8 @@ class World_map:
         if type(obj) is Player:
             mode = obj.mode
             if mode is pd.GRAB:
-                obj.rm_hand_effects()
-                obj.add_effect("handsand")
-            if mode in [pd.GRAB, pd.WALK, pd.BLOCK]:
+                obj.add_hand_effect("handsand")
+            if mode not in [pd.PUNCH]:
                 for effect in pd.FOOT_EFFECTS:
                     obj.rm_effect(effect)
 
@@ -112,8 +113,11 @@ class World_map:
             if mode is pd.WALK:
                 self.service_floor(obj)
             if mode is pd.GRAB:
-                obj.rm_hand_effects()
-                obj.add_effect("handwood")
+                obj.add_hand_effect("handwood")
+                x = obj.x
+                y = obj.y
+                self.mapData[y][x] = wd.FLOOR
+                map_tiles[y][x].repaint_tile(wd.FLOOR)
 
     def service_glassc(self, obj=None):
         if type(obj) is Player:
@@ -133,8 +137,11 @@ class World_map:
             if mode is pd.WALK:
                 self.service_floor(obj)
             if mode is pd.GRAB:
-                obj.rm_hand_effects()
-                obj.add_effect("handglass")
+                obj.add_hand_effect("handglass")
+                x = obj.x
+                y = obj.y
+                self.mapData[y][x] = wd.FLOOR
+                map_tiles[y][x].repaint_tile(wd.FLOOR)
 
     def service_lava(self, obj=None):
         if type(obj) is Player:
@@ -162,9 +169,8 @@ class World_map:
             if mode is pd.GRAB:
                 map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
                 obj.add_effect("hotfeet")
-                obj.rm_hand_effects()
-                obj.add_effect("handlava")
-            if mode in [pd.BLOCK, pd.PUNCH]:
+                obj.add_hand_effect("handlava")
+            if mode in [pd.BLOCK]:
                 map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
                 obj.add_effect("hotfeet")
 
@@ -183,8 +189,7 @@ class World_map:
             else:
                 obj.add_effect("dampfeet")
             if mode is pd.GRAB:
-                obj.rm_hand_effects
-                obj.add_effect("handwet")
+                obj.add_hand_effect("handwet")
 
     def service_water(self, obj=None):
         if type(obj) is Player:
@@ -193,8 +198,7 @@ class World_map:
             obj.rm_effect("hotfeet")
             obj.rm_effect("dampfeet")
             if mode is pd.GRAB:
-                obj.rm_hand_effects()
-                obj.add_effect("handwet")
+                obj.add_hand_effect("handwet")
 
     def service_obs(self, obj=None):
         if type(obj) is Player:
@@ -202,12 +206,17 @@ class World_map:
             if mode is pd.WALK:
                 self.service_floor(obj)
             if mode is pd.GRAB:
-                obj.rm_hand_effects()
-                obj.add_effect("handpeb")
+                obj.add_hand_effect("handpeb")
+
+    def replace_tile(self, x, y, variant):
+        self.mapData[y][x] = variant
+        map_tiles[y][x].repaint_tile(variant)
+
 
 class mapTile(ProtoAnim):
     """the animated part of a tile--image frames and whatnot"""
     CONSOLE_DETAIL = m_c.WORLD_CONSOLE_DETAIL
+
     def __init__(self, x, y, my_time):
         name = 'tile-' + str(x) + "-" + str(y)
         self.x = x

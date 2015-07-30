@@ -9,7 +9,8 @@ import playerData as pd
 
 class Player(ProtoAnim):
     CONSOLE_DETAIL = m_c.PLAYER_CONSOLE_DETAIL
-    key_map = {'q': pd.WALK, 'w': pd.PUNCH, 'e': pd.BLOCK}
+    key_map = {'q': pd.WALK, 'w': pd.PUNCH,
+               'e': pd.BLOCK, 'r': pd.GRAB}
 
 
     def __init__(self, name, my_time):
@@ -78,9 +79,10 @@ class Player(ProtoAnim):
         for effect in pd.FOOT_EFFECTS:
             self.rm_effect(effect)
 
-    def rm_hand_effects(self):
+    def add_hand_effect(self, variant):
         for effect in pd.HAND_EFFECTS:
             self.rm_effect(effect)
+        self.add_effect(variant)
 
     def cycle_move(self):
         self.mode += 1
@@ -98,7 +100,18 @@ class Player(ProtoAnim):
 
     def move_arrow(self, dir):
         self.rm_effect("blocking")
-        getattr(self, pd.MOVELIST[self.mode][0])(dir)
+        if self.mode in [pd.WALK, pd.BLOCK, pd.PUNCH]:
+            getattr(self, pd.MOVELIST[self.mode][0])(dir)
+
+    def spacebar(self):
+        self.rm_effect("blocking")
+        if self.mode in [pd.GRAB]:
+            getattr(self, pd.MOVELIST[self.mode][0])()
+
+    def grab(self, dir=-1):
+        if dir == -1:
+            self.my_world.service_tile(self.x, self.y, self)
+
 
     def punch(self, dir):
         self.facing = dir

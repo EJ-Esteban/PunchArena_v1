@@ -44,7 +44,7 @@ class StatBar:
                 button_canvas[i][j].grid(row=1 + i, column=2 + j)
 
         # special buttons
-        for x in range(3):
+        for x in range(4):
             buttons[0][x].replace_image(pd.MOVELIST[x][1])
             buttons[0][x].register_object()
             buttons[0][x].register_move(self.my_player, x)

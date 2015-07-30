@@ -70,6 +70,9 @@ class Game:
         global game_console
         game_console = console
 
+    def debug_place_world_tile(self, x, y, variant):
+        self.game_arena.replace_tile(x, y, variant)
+
 
 class TimeCore:
     def __init__(self, tkinter_master, state_core, msg_core, tick_mod=10000):
@@ -196,8 +199,7 @@ class GameInput:
             player.set_move(player.key_map[foo])
 
     def space_detect(event):
-        pass
-        # game_object.player1.cycle_move()
+        game_object.player1.spacebar()
 
     def leftKey(event):
         GameInput.try_move(m_c.WEST)

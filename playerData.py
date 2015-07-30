@@ -16,13 +16,13 @@ HIGH_MOVE = BLOCK
 MOVELIST = dict()
 # elementary moves
 MOVELIST[WALK] = ('walk', 'movebutton',
-                  'Move (Q)', "Walk around the tiles, all fancy-like.")
+                  'Move (Q)', "Walk around the tiles, all fancy-like. (arrows)")
 MOVELIST[BLOCK] = ('block', 'blockbutton',
-                   "Block (W)", "Brace yourself to reduce injuries from a certain direction")
+                   "Block (W)", "Brace yourself to reduce incoming injuries. (arrows)")
 MOVELIST[PUNCH] = ('punch', 'punchbutton',
-                   "Punch (E)", "Agress enemies and map tiles")
+                   "Punch (E)", "Agress enemies and map tiles. (arrows)")
 MOVELIST[GRAB] = ('grab', 'grabbutton',
-                  "Grab (R)", "Pick up debris (space) or grab enemies (arrows) to wrestle them!. ")
+                  "Grab (R)", "Pick up debris (space) or grab nearby enemies (arrows). ")
 MOVELIST[THROW] = ('throw', 'throwbutton',
                    "Throw (R)", "Toss an enemy in a direction")
 
@@ -32,7 +32,7 @@ VALID_EFFECTS = dict()
 VALID_EFFECTS["blocking"] = ("Blocking",
                              "You are braced for impact!", "dark red")
 VALID_EFFECTS["errconfused"] = ("Confused",
-                                "What was that tile you broke!?!?!!", "purple")
+                                "What was that tile you broke!?!?!!", "violet")
 
 #foot effects
 FOOT_EFFECTS = ["wetfeet", "dampfeet", "hotfeet"]
@@ -44,16 +44,16 @@ VALID_EFFECTS["hotfeet"] = ("Hot Feet",
                             "Your shoes are quite hot.", "dark orange")
 
 # hand effects
-HAND_FILLED_EFFECTS = ["handpeb", "handlava", "handwet", "handsand", "handwood", "handglass"]
-VALID_EFFECTS["handpeb"] = ("Pebbles in Hand",
+HAND_EFFECTS = ["handpeb", "handlava", "handwet", "handsand", "handwood", "handglass"]
+VALID_EFFECTS["handpeb"] = ("pebbles",
                            "Your hand is filled with obsidian pebbles.", "dark gray")
 VALID_EFFECTS["handlava"] = ("Lava in Hand",
-                           "Your hand is coated in lava. Also, it's on fire.", "dark orange")
+                             "Your hand is coated in lava. Also, it's on fire.", "orange")
 VALID_EFFECTS["handwet"] = ("Wet Hand",
                            "Your hand is wet. Good for exterminating green witches.", "light blue")
 VALID_EFFECTS["handsand"] = ("Sandy Hand",
-                           "You have a handful of sand.", "orange")
-VALID_EFFECTS["handwood"] = ("Splinters in Hand",
+                             "You have a handful of sand.", "yellow")
+VALID_EFFECTS["handwood"] = ("Got Splinters?",
                            "You're carrying some sharp wooden splinters.", "brown")
-VALID_EFFECTS["handglass"] = ("Shards in Hand",
+VALID_EFFECTS["handglass"] = ("Sharp Ammo",
                            "You're carrying some sharp glass shards.", "white")
