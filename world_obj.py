@@ -48,63 +48,23 @@ class World_map:
         self.mapData[y][x] = new_type
         map_tiles[y][x].repaint_tile(new_type)
 
-    def tile_is_special(self, x, y):
-        if self.mapData[y][x] in wd.SPECIAL_TILES:
-            return map_tiles[y][x].info_tuple[0]
-        return ""
+    def player_broke_tile(self, obj):
+        x = obj.next_x
+        y = obj.next_y
+        self.degrade_tile(x, y)
 
-    def service_special_tile(self, variant, obj):
+    def service_tile(self, x, y, obj):
+        variant = self.mapData[y][x]
+        variant = wd.TILE_LIB[variant][1]
         variant = variant.lower()
         getattr(self, "service_" + variant)(obj)
 
-    def service_lava(self, obj=None):
+    def service_err(self, obj=None):
         if type(obj) is Player:
-            x = obj.x
-            y = obj.y
-            if obj.has_effect("wetfeet"):
-                self.mapData[y][x] = wd.OBSIDIAN
-                map_tiles[y][x].repaint_tile(wd.OBSIDIAN)
-                map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
-                obj.rm_effect("wetfeet")
-                obj.rm_effect("dampfeet")
-                map_tiles[y][x].send_to_console(obj.name + " cooled the lava without incident.", val=2)
-            elif obj.has_effect("dampfeet"):
-                self.mapData[y][x] = wd.OBSIDIAN
-                map_tiles[y][x].repaint_tile(wd.OBSIDIAN)
-                map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
-                obj.rm_effect("dampfeet")
-                map_tiles[y][x].send_to_console(obj.name + " cooled the lava but was singed.", val=2)
-                obj.add_effect("hotfeet")
-            else:
-                map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
-                obj.add_effect("hotfeet")
-
-    def service_water(self, obj=None):
-        if type(obj) is Player:
-            obj.add_effect("wetfeet")
-            obj.rm_effect("hotfeet")
-            obj.rm_effect("dampfeet")
-
-    def service_puddle(self, obj=None):
-        if type(obj) is Player:
-            if obj.has_effect("hotfeet"):
-                x = obj.x
-                y = obj.y
-                self.mapData[y][x] = wd.FLOOR
-                map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
-                map_tiles[y][x].repaint_tile(wd.FLOOR)
-                obj.rm_effect("hotfeet")
-            elif obj.has_effect("wetfeet"):
-                pass
-            else:
-                obj.add_effect("dampfeet")
-
-    def service_sand(self, obj=None):
-        if type(obj) is Player:
-            # removes all foot effects
-            for effect in pd.FOOT_EFFECTS:
-                obj.rm_effect(effect)
-
+            mode = obj.mode
+            if mode is pd.PUNCH:
+                self.player_broke_tile(obj)
+                obj.add_effect("errconfused")
 
     def service_floor(self, obj=None):
         if type(obj) is Player:
@@ -116,6 +76,134 @@ class World_map:
                 map_tiles[y][x].repaint_tile(wd.PUDDLE)
                 obj.rm_effect("wetfeet")
 
+    def service_wall(self, obj=None):
+        if type(obj) is Player:
+            pass
+
+    def service_pglass(self, obj=None):
+        if type(obj) is Player:
+            pass
+
+    def service_sand(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            if mode is pd.GRAB:
+                obj.rm_hand_effects()
+                obj.add_effect("handsand")
+            if mode in [pd.GRAB, pd.WALK, pd.BLOCK]:
+                for effect in pd.FOOT_EFFECTS:
+                    obj.rm_effect(effect)
+
+    def service_woodc(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            if mode is pd.PUNCH:
+                self.player_broke_tile(obj)
+
+    def service_woodb(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            if mode is pd.PUNCH:
+                self.player_broke_tile(obj)
+
+    def service_wooda(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            if mode is pd.WALK:
+                self.service_floor(obj)
+            if mode is pd.GRAB:
+                obj.rm_hand_effects()
+                obj.add_effect("handwood")
+
+    def service_glassc(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            if mode is pd.PUNCH:
+                self.player_broke_tile(obj)
+
+    def service_glassb(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            if mode is pd.PUNCH:
+                self.player_broke_tile(obj)
+
+    def service_glassa(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            if mode is pd.WALK:
+                self.service_floor(obj)
+            if mode is pd.GRAB:
+                obj.rm_hand_effects()
+                obj.add_effect("handglass")
+
+    def service_lava(self, obj=None):
+        if type(obj) is Player:
+            x = obj.x
+            y = obj.y
+            mode = obj.mode
+            if mode is pd.WALK:
+                if obj.has_effect("wetfeet"):
+                    self.mapData[y][x] = wd.OBSIDIAN
+                    map_tiles[y][x].repaint_tile(wd.OBSIDIAN)
+                    map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
+                    obj.rm_effect("wetfeet")
+                    obj.rm_effect("dampfeet")
+                    map_tiles[y][x].send_to_console(obj.name + " cooled the lava without incident.", val=2)
+                elif obj.has_effect("dampfeet"):
+                    self.mapData[y][x] = wd.OBSIDIAN
+                    map_tiles[y][x].repaint_tile(wd.OBSIDIAN)
+                    map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
+                    obj.rm_effect("dampfeet")
+                    map_tiles[y][x].send_to_console(obj.name + " cooled the lava but was singed.", val=2)
+                    obj.add_effect("hotfeet")
+                else:
+                    map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
+                    obj.add_effect("hotfeet")
+            if mode is pd.GRAB:
+                map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
+                obj.add_effect("hotfeet")
+                obj.rm_hand_effects()
+                obj.add_effect("handlava")
+            if mode in [pd.BLOCK, pd.PUNCH]:
+                map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
+                obj.add_effect("hotfeet")
+
+    def service_puddle(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            if obj.has_effect("hotfeet"):
+                x = obj.x
+                y = obj.y
+                self.mapData[y][x] = wd.FLOOR
+                map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
+                map_tiles[y][x].repaint_tile(wd.FLOOR)
+                obj.rm_effect("hotfeet")
+            elif obj.has_effect("wetfeet"):
+                pass
+            else:
+                obj.add_effect("dampfeet")
+            if mode is pd.GRAB:
+                obj.rm_hand_effects
+                obj.add_effect("handwet")
+
+    def service_water(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            obj.add_effect("wetfeet")
+            obj.rm_effect("hotfeet")
+            obj.rm_effect("dampfeet")
+            if mode is pd.GRAB:
+                obj.rm_hand_effects()
+                obj.add_effect("handwet")
+
+    def service_obs(self, obj=None):
+        if type(obj) is Player:
+            mode = obj.mode
+            if mode is pd.WALK:
+                self.service_floor(obj)
+            if mode is pd.GRAB:
+                obj.rm_hand_effects()
+                obj.add_effect("handpeb")
 
 class mapTile(ProtoAnim):
     """the animated part of a tile--image frames and whatnot"""

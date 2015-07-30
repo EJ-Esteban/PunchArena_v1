@@ -40,7 +40,7 @@ TILE_LIB[WALL] = (
     "Wall", "wall", "An indestructible titanium wall",
     1, 0)
 TILE_LIB[PLEXIGLASS] = (
-    "Plexiglass", "window", "An indestructible plexiglass window",
+    "Plexiglass", "pglass", "An indestructible plexiglass window",
     1, 0)
 TILE_LIB[SAND] = (
     "Sand", "sand", "Huh. Someone dumped sand all over this tile.",
@@ -73,16 +73,16 @@ TILE_LIB[WATER] = (
     "Water", "water", "You're a terrible swimmer. Might wanna stay out of this one.",
     4, 5)
 TILE_LIB[OBSIDIAN] = (
-    "Obsidian", "obs", "A solid rock floor, but pretty boring all told.",
+    "Obsidian Floor", "obs", "A solid rock floor, but pretty boring all told.",
     1, 0)
 
 # data on what can be walked, shot through, broken
 # these floors can be passed
 WALKABLE_TILES = (FLOOR, SAND, WOOD_MISSING, GLASS_MISSING, LAVA, PUDDLE, WATER, OBSIDIAN)
-PROJECTILE_TILES = (FLOOR, PLEXIGLASS, GLASS, GLASS_CRACKED, GLASS_CRACKED, WOOD_MISSING, LAVA, WATER, PUDDLE, OBSIDIAN)
-BREAKABLE_TILES = (WOOD, WOOD_CRACKED, GLASS, GLASS_CRACKED, ERROR)
-SPECIAL_TILES = (LAVA, PUDDLE, WATER, SAND, FLOOR, GLASS_MISSING, WOOD_MISSING)
 
+PROJECTILE_TILES = (FLOOR, PLEXIGLASS, GLASS, GLASS_CRACKED, GLASS_CRACKED, WOOD_MISSING, LAVA, WATER, PUDDLE, OBSIDIAN)
+
+BREAKABLE_TILES = (WOOD, WOOD_CRACKED, GLASS, GLASS_CRACKED, ERROR)
 
 # breakables dictionary tells what comes next when something breaks
 NEXT_BREAK = dict()

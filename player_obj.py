@@ -74,6 +74,14 @@ class Player(ProtoAnim):
         if self.has_effect(value):
             self.active_effects.remove(value)
 
+    def rm_foot_effects(self):
+        for effect in pd.FOOT_EFFECTS:
+            self.rm_effect(effect)
+
+    def rm_hand_effects(self):
+        for effect in pd.HAND_EFFECTS:
+            self.rm_effect(effect)
+
     def cycle_move(self):
         self.mode += 1
         self.mode %= pd.HIGH_MOVE + 1
@@ -108,9 +116,9 @@ class Player(ProtoAnim):
         punched = self.my_world.can_break_tile(self.next_x, self.next_y)
         s = "punching tile at " + str(self.next_x) + "," + str(self.next_y)
         if punched:
-            self.my_world.degrade_tile(self.next_x, self.next_y)
             s += "\nBroke a tile!"
         self.send_to_console(s, val=2)
+        self.my_world.service_tile(self.next_x, self.next_y, self)
         self.anim_frame = 2  # set to punch frame
         self.tick_til = pd.PLAYER_ANIM_DELAY_LONG
         self.animate()
@@ -135,24 +143,16 @@ class Player(ProtoAnim):
         else:
             dy = 1
         self.predict(dx, dy)
-        col = self.my_world.can_walk_tile(self.next_x, self.next_y)
-        if col:
+        s = "Path was "
+        if self.my_world.can_walk_tile(self.next_x, self.next_y):
             self.set_coords(self.next_x, self.next_y)
-            spc = self.my_world.tile_is_special(self.x, self.y)
-            if spc:
-                self.my_world.service_special_tile(spc, self)
-        if self.console_ready(2):
-            s = "Path was "
-            if not col:
-                s += "blocked."
-            else:
-                s += "taken."
-                if not spc == "":
-                    s += "Player " + self.name + " walked onto a special tile: " + spc
-            s += "\n"
-            self.send_to_console(
-                "Trying to move Player " + self.name + " to " + str(self.next_x) + "," + str(self.next_y), s, val=2)
-
+            s += "taken."
+        else:
+            s += "blocked."
+        s += "\n"
+        self.send_to_console(
+            "Trying to move Player " + self.name + " to " + str(self.next_x) + "," + str(self.next_y), s, val=2)
+        self.my_world.service_tile(self.x, self.y, self)
         self.animate()
 
     def predict(self, dx, dy):
