@@ -101,12 +101,11 @@ class TimeCore:
 
     def tick(self):
         for o in self.anim_objects:
-            o.animate_tick();
+            o.animate_tick()
         self.msg_core.play_messages()
         self.master.after(m_c.ANIM_DT, self.tick)
 
     def animation_blocked(self):
-        probe = True
         self.blocking_sem.acquire()
         probe = (self.blocking_anims > 0)
         self.blocking_sem.release()
@@ -189,14 +188,12 @@ class MessageCore:
 
 
 class GameInput:
+
     def key_detect(event):
         foo = event.char
-        if foo == 'q':
-            game_object.player1.set_move(0)
-        elif foo == 'w':
-            game_object.player1.set_move(1)
-        elif foo == 'e':
-            game_object.player1.set_move(2)
+        player = game_object.player1
+        if foo in player.key_map.keys():
+            player.set_move(player.key_map[foo])
 
     def space_detect(event):
         pass

@@ -9,6 +9,8 @@ import playerData as pd
 
 class Player(ProtoAnim):
     CONSOLE_DETAIL = m_c.PLAYER_CONSOLE_DETAIL
+    key_map = {'q': pd.WALK, 'w': pd.PUNCH, 'e': pd.BLOCK}
+
 
     def __init__(self, name, my_time):
         ProtoAnim.__init__(self, name, my_time)
@@ -88,12 +90,7 @@ class Player(ProtoAnim):
 
     def move_arrow(self, dir):
         self.rm_effect("blocking")
-        if self.mode == pd.PUNCH:
-            self.punch(dir)
-        elif self.mode == pd.BLOCK:
-            self.block(dir)
-        else:  # walk mode
-            self.move(dir)
+        getattr(self, pd.MOVELIST[self.mode][0])(dir)
 
     def punch(self, dir):
         self.facing = dir
@@ -123,7 +120,7 @@ class Player(ProtoAnim):
         self.add_effect("blocking")
         self.animate()
 
-    def move(self, dir):
+    def walk(self, dir):
         if not self.is_turn():
             return
         self.facing = dir

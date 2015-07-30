@@ -5,6 +5,7 @@ import myconstants as m_c
 from animatable import ProtoAnim
 
 from player_obj import Player
+import playerData as pd
 
 map_tiles = [[0 for y in range(12)] for x in range(8)]
 
@@ -73,9 +74,10 @@ class World_map:
                 map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
                 obj.rm_effect("dampfeet")
                 map_tiles[y][x].send_to_console(obj.name + " cooled the lava but was singed.", val=2)
+                obj.add_effect("hotfeet")
             else:
                 map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
-            obj.add_effect("hotfeet")
+                obj.add_effect("hotfeet")
 
     def service_water(self, obj=None):
         if type(obj) is Player:
@@ -99,9 +101,10 @@ class World_map:
 
     def service_sand(self, obj=None):
         if type(obj) is Player:
-            obj.rm_effect("wetfeet")
-            obj.rm_effect("hotfeet")
-            obj.rm_effect("dampfeet")
+            # removes all foot effects
+            for effect in pd.FOOT_EFFECTS:
+                obj.rm_effect(effect)
+
 
     def service_floor(self, obj=None):
         if type(obj) is Player:
