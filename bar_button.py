@@ -57,6 +57,7 @@ class BarButton(ProtoAnim):
         self.my_canvas.bind("<Enter>", self.hover_in)
         self.my_canvas.bind("<Leave>", self.hover_out)
         self.my_canvas.bind("<ButtonRelease-1>", self.button_clicked)
+        self.my_canvas.bind("<Double-Button-1>", self.button_doubleclicked)
 
     def add_button_description(self, big, little):
         self.bigtext = big
@@ -74,3 +75,7 @@ class BarButton(ProtoAnim):
     def button_clicked(self, event):
         if hasattr(self, "player"):
             self.player.set_move(self.mode)
+
+    def button_doubleclicked(self, event):
+        if hasattr(self, "player"):
+            self.player.spacebar()

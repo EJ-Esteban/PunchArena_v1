@@ -45,15 +45,15 @@ VALID_EFFECTS["hotfeet"] = ("Hot Feet",
 
 # hand effects
 HAND_EFFECTS = ["handpeb", "handlava", "handwet", "handsand", "handwood", "handglass"]
-VALID_EFFECTS["handpeb"] = ("pebbles",
+VALID_EFFECTS["handpeb"] = ("Object in Hand",
                            "Your hand is filled with obsidian pebbles.", "dark gray")
-VALID_EFFECTS["handlava"] = ("Lava in Hand",
+VALID_EFFECTS["handlava"] = ("Object in Hand",
                              "Your hand is coated in lava. Also, it's on fire.", "orange")
-VALID_EFFECTS["handwet"] = ("Wet Hand",
+VALID_EFFECTS["handwet"] = ("Object in Hand",
                            "Your hand is wet. Good for exterminating green witches.", "light blue")
-VALID_EFFECTS["handsand"] = ("Sandy Hand",
+VALID_EFFECTS["handsand"] = ("Object in Hand",
                              "You have a handful of sand.", "yellow")
-VALID_EFFECTS["handwood"] = ("Got Splinters?",
+VALID_EFFECTS["handwood"] = ("Object in Hand",
                            "You're carrying some sharp wooden splinters.", "brown")
-VALID_EFFECTS["handglass"] = ("Sharp Ammo",
+VALID_EFFECTS["handglass"] = ("Object in Hand",
                            "You're carrying some sharp glass shards.", "white")
