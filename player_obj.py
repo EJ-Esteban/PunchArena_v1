@@ -12,8 +12,7 @@ class Player(ProtoAnim):
     key_map = {'q': pd.WALK, 'w': pd.PUNCH,
                'e': pd.BLOCK, 'r': pd.GRAB}
 
-
-    def __init__(self, name, my_time):
+    def __init__(self, name, my_time, NPC=True):
         ProtoAnim.__init__(self, name, my_time)
 
         self.tick_til = pd.PLAYER_ANIM_DELAY
@@ -23,7 +22,11 @@ class Player(ProtoAnim):
 
         self.x = self.y = 0
         self.next_x = self.next_y = 0
+
         self.active_effects = []
+
+        if not NPC:
+            self.buttons = dict()
 
     def attach_canvas(self, canvas=None):
         # players should attach to world canvas
@@ -31,6 +34,13 @@ class Player(ProtoAnim):
 
     def attach_worldmap(self, map_obj):
         self.my_world = map_obj
+
+    def bind_button(self, obj, key):
+        self.buttons[key] = obj
+
+    def unbind_button(self, key):
+        if key in self.buttons.keys():
+            del self.buttons[key]
 
     def set_coords(self, x, y):
         self.x = x
@@ -79,21 +89,24 @@ class Player(ProtoAnim):
         for effect in pd.FOOT_EFFECTS:
             self.rm_effect(effect)
 
-    def add_hand_effect(self, variant):
+    def rm_hand_effects(self):
         for effect in pd.HAND_EFFECTS:
             self.rm_effect(effect)
+
+    def add_hand_effect(self, variant):
+        self.rm_hand_effects()
         self.add_effect(variant)
 
     def cycle_move(self):
         self.mode += 1
         self.mode %= pd.HIGH_MOVE + 1
         move = pd.MOVELIST[self.mode]
-        self.send_to_console("Equipped move " + move[0], val=2)
+        self.send_to_console("Equipped move " + move[0], val=3)
 
     def set_move(self, num):
         self.mode = num
         move = pd.MOVELIST[self.mode]
-        self.send_to_console("Equipped move " + move[0], val=2)
+        self.send_to_console("Equipped move " + move[0], val=3)
 
     def is_turn(self):
         return self.game_state.player_can_move(1)
@@ -105,13 +118,32 @@ class Player(ProtoAnim):
 
     def spacebar(self):
         self.rm_effect("blocking")
-        if self.mode in [pd.GRAB]:
+        if self.mode in [pd.GRAB, pd.THROW]:
             getattr(self, pd.MOVELIST[self.mode][0])()
 
     def grab(self, dir=-1):
         if dir == -1:
             self.my_world.service_tile(self.x, self.y, self)
 
+        button = self.buttons[pd.MOVELIST[pd.GRAB][1]]
+        button.replace_image(pd.MOVELIST[pd.THROW][1])
+        button.register_move(self, pd.THROW)
+        button.add_button_description(pd.MOVELIST[pd.THROW][2], pd.MOVELIST[pd.THROW][3])
+        self.mode = pd.THROW
+        self.key_map['r'] = pd.THROW
+
+    def throw(self, dir=-1):
+        print("throw")
+        if dir == -1:
+            self.rm_hand_effects()
+            self.my_world.service_tile(self.x, self.y, self)
+
+        button = self.buttons[pd.MOVELIST[pd.THROW][1]]
+        button.replace_image(pd.MOVELIST[pd.GRAB][1])
+        button.register_move(self, pd.GRAB)
+        button.add_button_description(pd.MOVELIST[pd.GRAB][2], pd.MOVELIST[pd.GRAB][3])
+        self.mode = pd.GRAB
+        self.key_map['r'] = pd.GRAB
 
     def punch(self, dir):
         self.facing = dir

@@ -43,14 +43,16 @@ class StatBar:
                 buttons[i][j].attach_canvas(button_canvas[i][j])
                 button_canvas[i][j].grid(row=1 + i, column=2 + j)
 
-        # special buttons
+        # populate elementary moves
         for x in range(4):
             buttons[0][x].replace_image(pd.MOVELIST[x][1])
             buttons[0][x].register_object()
             buttons[0][x].register_move(self.my_player, x)
             buttons[0][x].attach_message_core(self.my_msg)
             buttons[0][x].add_button_description(pd.MOVELIST[x][2], pd.MOVELIST[x][3])
-
+            self.my_player.bind_button(buttons[0][x], pd.MOVELIST[x][1])
+        # throw is also an elementary move that toggles from Grab
+        self.my_player.bind_button(buttons[0][pd.GRAB], pd.MOVELIST[pd.THROW][1])
 
     def make_spacers(self):
         self.fill_wall = tk.PhotoImage(file="./images/statbar/filler.gif")

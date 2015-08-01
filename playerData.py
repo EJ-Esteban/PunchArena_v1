@@ -8,7 +8,7 @@ PUNCH = 1
 BLOCK = 2
 GRAB = 3
 THROW = 4
-HIGH_MOVE = BLOCK
+HIGH_MOVE = GRAB
 
 # Dictionary of player moves
 # (internal_name,

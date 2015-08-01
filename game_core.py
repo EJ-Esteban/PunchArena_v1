@@ -46,7 +46,7 @@ class Game:
 
     def place_player_char(self, map_canvas):
         # create player
-        self.player1 = Player("player1", self.my_time)
+        self.player1 = Player("player1", self.my_time, NPC=False)
         # associate player with canvas, create sprite, and register for animation
         self.player1.attach_canvas(map_canvas)
         self.player1.create_sprite("player1")
