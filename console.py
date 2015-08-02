@@ -55,6 +55,8 @@ class ConsoleWindow:
 
     def send_cmd(self, event):
         self.cmd = self.cmdline.get()
+        if self.cmd == "":
+            return
         self.cmdline.delete(0, tk.END)
         self.resolve_cmd()
 
@@ -182,6 +184,16 @@ class ConsoleWindow:
                 self.print("error-- not enough arguments\n")
             except ValueError:
                 self.print("error-- some arguments are not integers\n")
+
+    def time(self, items):
+        """gets game tick"""
+        if items == "@givehelp":
+            self.print("returns a dictionary of time info on the current clock.")
+        else:
+            s = self.game.check_time()
+            for i in s.keys():
+                self.print(str(i) + ': ' + str(s[i]))
+
 
 
 if __name__ == "__main__":
