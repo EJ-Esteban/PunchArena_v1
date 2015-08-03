@@ -45,8 +45,7 @@ class World_map:
 
     def degrade_tile(self, x, y):
         new_type = wd.NEXT_BREAK[self.mapData[y][x]]
-        self.mapData[y][x] = new_type
-        map_tiles[y][x].repaint_tile(new_type)
+        self.replace_tile(x, y, new_type)
 
     def player_broke_tile(self, obj):
         x = obj.next_x
@@ -73,9 +72,8 @@ class World_map:
                 if obj.has_effect("wetfeet"):
                     x = obj.x
                     y = obj.y
-                    self.mapData[y][x] = wd.PUDDLE
                     map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "plop!\n", val=2)
-                    map_tiles[y][x].repaint_tile(wd.PUDDLE)
+                    self.replace_tile(x, y, wd.PUDDLE)
                     obj.rm_effect("wetfeet")
 
     def service_wall(self, obj=None):
@@ -116,8 +114,7 @@ class World_map:
                 obj.add_hand_effect("handwood")
                 x = obj.x
                 y = obj.y
-                self.mapData[y][x] = wd.FLOOR
-                map_tiles[y][x].repaint_tile(wd.FLOOR)
+                self.replace_tile(x, y, wd.FLOOR)
 
     def service_glassc(self, obj=None):
         if type(obj) is Player:
@@ -140,8 +137,7 @@ class World_map:
                 obj.add_hand_effect("handglass")
                 x = obj.x
                 y = obj.y
-                self.mapData[y][x] = wd.FLOOR
-                map_tiles[y][x].repaint_tile(wd.FLOOR)
+                self.replace_tile(x, y, wd.FLOOR)
 
     def service_lava(self, obj=None):
         if type(obj) is Player:
@@ -150,15 +146,13 @@ class World_map:
             mode = obj.mode
             if mode is pd.WALK:
                 if obj.has_effect("wetfeet"):
-                    self.mapData[y][x] = wd.OBSIDIAN
-                    map_tiles[y][x].repaint_tile(wd.OBSIDIAN)
+                    self.replace_tile(x, y, wd.OBSIDIAN)
                     map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
                     obj.rm_effect("wetfeet")
                     obj.rm_effect("dampfeet")
                     map_tiles[y][x].send_to_console(obj.name + " cooled the lava without incident.", val=2)
                 elif obj.has_effect("dampfeet"):
-                    self.mapData[y][x] = wd.OBSIDIAN
-                    map_tiles[y][x].repaint_tile(wd.OBSIDIAN)
+                    self.replace_tile(x, y, wd.OBSIDIAN)
                     map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
                     obj.rm_effect("dampfeet")
                     map_tiles[y][x].send_to_console(obj.name + " cooled the lava but was singed.", val=2)
@@ -180,9 +174,8 @@ class World_map:
             if obj.has_effect("hotfeet"):
                 x = obj.x
                 y = obj.y
-                self.mapData[y][x] = wd.FLOOR
                 map_tiles[y][x].send_to_console(str(x) + "," + str(y) + ":", "sizzle!\n", val=2)
-                map_tiles[y][x].repaint_tile(wd.FLOOR)
+                self.replace_tile(x, y, wd.FLOOR)
                 obj.rm_effect("hotfeet")
             elif obj.has_effect("wetfeet"):
                 pass
