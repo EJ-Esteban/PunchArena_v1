@@ -1,6 +1,7 @@
 import tkinter as tk
 import myconstants as m_c
 import worldData as wd
+from game_core import StateCore
 
 from types import FunctionType
 from difflib import SequenceMatcher
@@ -193,6 +194,19 @@ class ConsoleWindow:
             s = self.game.check_time()
             for i in s.keys():
                 self.print(str(i) + ': ' + str(s[i]))
+
+    def makestate(self, items):
+        if items == "@givehelp":
+            self.print("forces state machine into a given state. Valid states:")
+            self.print(str(StateCore.valid_states))
+        else:
+            vals = items.split()
+            s = vals[0]
+            if s not in StateCore.valid_states:
+                self.print("You entered an invalid state.")
+                return
+            self.print("Forcing state machine into state: %s." % s)
+            self.game.force_state(s)
 
 
 

@@ -45,7 +45,8 @@ WEST = 3
 
 
 # message priorities
-PRIO_TOP = 5  # absolute top (
+PRIO_PLAYING = 7  # messages get this by being played, NOT when created
+PRIO_TOP = 5  # top priority
 PRIO_MSG_FREEZE = 4  # freezingf message (notifications, etc.)
 PRIO_HOVER_FORE = 3  # hover 1 (hovering over a player)
 PRIO_HOVER_BACK = 2  # hover 2 (hovering over a map tile, command)

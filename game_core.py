@@ -27,6 +27,7 @@ class Game:
         self.my_state = StateCore()
         # create message core
         self.my_msg = MessageCore(self.my_state)
+        self.my_state.attach_message_core(self.my_msg)
         # create time core (animation, state machine update)
         self.my_time = TimeCore(master, self.my_state, self.my_msg)
 
@@ -77,6 +78,9 @@ class Game:
     def check_time(self):
         return self.my_time.check_time()
 
+    def force_state(self, s):
+        self.my_state.set_state(s)
+
 
 class TimeCore:
     """
@@ -122,13 +126,14 @@ class TimeCore:
 
     def tick(self):
         """creates and calls threads to run animation and state machine updates"""
+
         # service the state machine at the start of every step
         animation_threads = []
-        self.state_core.service()
+        a = self.state_core.service()
         # play any messages
-        t = threading.Thread(target=self.msg_core.play_messages)
-        animation_threads.append(t)
-        t.start()
+        self.msg_core.play_messages()
+        if a is False:
+            return
         # animate any obhects
         for o in self.anim_objects:
             t = threading.Thread(target=o.animate_tick)
@@ -150,15 +155,28 @@ class TimeCore:
 
 class StateCore:
     valid_states = ('setup', 'player_turn', 'in_turn_wait',
-                    'pre_turn_wait', 'change_players', 'endgame', 'error_check', 'error_set')
+                    'pre_turn_wait', 'change_players', 'endgame', 'error_check', 'error_set', 'freeze')
 
     def __init__(self):
         self.state = 'setup'
         self.player = 1
         self.state_lock = threading.Lock()
+        self.forced = False
+        self.my_msg = None
+
+    def attach_message_core(self, msg):
+        self.my_msg = msg
+
+    def set_player(self, num):
+        self.state_lock.acquire()
+        self.player = num
+        self.state_lock.release()
 
     def check_state(self):
         self.state_lock.acquire()
+        if self.forced:
+            self.state_lock.release()
+            return self.state
         if self.state not in StateCore.valid_states:
             self.state = 'error_check'
         self.state_lock.release()
@@ -188,6 +206,36 @@ class StateCore:
 
     def service(self):
         s = self.check_state()
+        if s == 'player_turn':
+            pass
+        elif s == 'in_turn_wait':
+            pass
+        elif s == 'pre_turn_wait':
+            pass
+        elif s == 'change_players':
+            pass
+        elif s == 'endgame':
+            pass
+        elif s == 'freeze':
+            return False
+        elif s in ['error_check', 'error_set', 'setup']:
+            console_packet = ['console', "ERROR: STATE MACHINE HAS ENTERED UNSERVICABLE STATE:", s, m_c.PRIO_TOP, 0,
+                              False]
+            self.send_to_console(console_packet)
+            self.set_state('freeze')
+        else:
+            # you really should never see this message
+            console_packet = ['console', "ERROR: STATE MACHINE NOT IN KNOWN STATE:", s, m_c.PRIO_TOP, 0, False]
+            self.send_to_console(console_packet)
+            self.set_state('freeze')
+        return True
+
+    def send_to_console(self, console_packet):
+        if hasattr(self, 'msg_pipe'):
+            self.msg_pipe.add_message_candidate("state_machine_msg", console_packet)
+        else:
+            print(console_packet[1])
+            print(console_packet[2])
 
 
 class MessageCore:
