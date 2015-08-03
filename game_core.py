@@ -124,9 +124,7 @@ class TimeCore:
         """creates and calls threads to run animation and state machine updates"""
         # service the state machine at the start of every step
         animation_threads = []
-        t = threading.Thread(target=self.state_core.service)
-        animation_threads.append(t)
-        t.start()
+        self.state_core.service()
         # play any messages
         t = threading.Thread(target=self.msg_core.play_messages)
         animation_threads.append(t)

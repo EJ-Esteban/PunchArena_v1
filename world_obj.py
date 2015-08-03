@@ -203,8 +203,6 @@ class World_map:
     def service_obs(self, obj=None):
         if type(obj) is Player:
             mode = obj.mode
-            if mode is pd.WALK:
-                self.service_floor(obj)
             if mode is pd.GRAB:
                 obj.add_hand_effect("handpeb")
 
