@@ -95,7 +95,7 @@ class TimeCore:
         self.tick_mod = tick_mod  # 1.2k (1 minute) by default
         # blocking animation semaphore and count
         self.blocking_anims = 0
-        self.blocking_lock = threading.Lock()
+        self.msg_lock = threading.Lock()
 
     def check_time(self):
         a = {'Tick number:': self.tick_num, 'Animation dt:': str(m_c.ANIM_DT) + " ms"}
@@ -144,34 +144,49 @@ class TimeCore:
         self.master.after(m_c.ANIM_DT, self.tick)
 
     def animation_blocked(self):
-        self.blocking_lock.acquire()
+        self.msg_lock.acquire()
         probe = (self.blocking_anims > 0)
-        self.blocking_lock.release()
+        self.msg_lock.release()
         return probe
 
 
 class StateCore:
     valid_states = ('setup', 'player_turn', 'in_turn_wait',
-                    'pre_turn_wait', 'change_players', 'endgame', 'error')
+                    'pre_turn_wait', 'change_players', 'endgame', 'error_check', 'error_set')
 
     def __init__(self):
         self.state = 'setup'
         self.player = 1
+        self.state_lock = threading.Lock()
 
     def check_state(self):
+        self.state_lock.acquire()
         if self.state not in StateCore.valid_states:
-            self.state = 'error'
+            self.state = 'error_check'
+        self.state_lock.release()
         return self.state
+
+    def set_state(self, s):
+        a = True
+        self.state_lock.acquire()
+        if s not in StateCore.valid_states:
+            self.state = 'error_set'
+            a = False
+        else:
+            self.state = s
+        self.state_lock.release()
+        return a
 
     def player_can_move(self, num):
         # creates concept of "turns
-        return (self.state == 'player_turn') & (self.player == num)
+        s = self.check_state()
+        return (s == 'player_turn') & (self.player == num)
 
     def finish_setup(self):
-        self.state = 'player_turn'
+        self.set_state('player_turn')
 
     def win_game(self):
-        self.state = 'endgame'
+        self.set_state('endgame')
 
     def service(self):
         s = self.check_state()
