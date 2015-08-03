@@ -7,7 +7,7 @@ from world_obj import World_map
 
 from lower_bar import StatBar
 
-from threading import Semaphore
+import threading
 
 game_object = None
 game_console = None
@@ -77,6 +77,7 @@ class Game:
     def check_time(self):
         return self.my_time.check_time()
 
+
 class TimeCore:
     """
     This class manages animation and game ticks, mostly through the tick() method
@@ -94,7 +95,7 @@ class TimeCore:
         self.tick_mod = tick_mod  # 1.2k (1 minute) by default
         # blocking animation semaphore and count
         self.blocking_anims = 0
-        self.blocking_sem = Semaphore()
+        self.blocking_lock = threading.Lock()
 
     def check_time(self):
         a = {'Tick number:': self.tick_num, 'Animation dt:': str(m_c.ANIM_DT) + " ms"}
@@ -120,13 +121,21 @@ class TimeCore:
         self.state_core.finish_setup()
 
     def tick(self):
+        """creates and calls threads to run animation and state machine updates"""
         # service the state machine at the start of every step
-        self.state_core.service()
+        animation_threads = []
+        t = threading.Thread(target=self.state_core.service)
+        animation_threads.append(t)
+        t.start()
         # play any messages
-        self.msg_core.play_messages()
+        t = threading.Thread(target=self.msg_core.play_messages)
+        animation_threads.append(t)
+        t.start()
         # animate any obhects
         for o in self.anim_objects:
-            o.animate_tick()
+            t = threading.Thread(target=o.animate_tick)
+            animation_threads.append(t)
+            t.start()
         # tick again after
         self.tick_num += 1
         if self.tick_num >= self.tick_mod:
@@ -135,9 +144,9 @@ class TimeCore:
         self.master.after(m_c.ANIM_DT, self.tick)
 
     def animation_blocked(self):
-        self.blocking_sem.acquire()
+        self.blocking_lock.acquire()
         probe = (self.blocking_anims > 0)
-        self.blocking_sem.release()
+        self.blocking_lock.release()
         return probe
 
 
@@ -166,7 +175,6 @@ class StateCore:
 
     def service(self):
         s = self.check_state()
-
 
 
 class MessageCore:
