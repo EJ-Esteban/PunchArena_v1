@@ -45,6 +45,7 @@ class Game:
         self.statbar = StatBar(statbar_frame, self.my_time, self.my_msg, self.player1)
         self.hover_box = self.statbar.get_hover()
         self.my_msg.register_hoverbox(self.hover_box)
+        self.my_msg.create_overhead(map_canvas)
 
     def place_player_char(self, map_canvas):
         # create player
@@ -225,7 +226,8 @@ class StateCore:
             self.set_state('freeze')
         else:
             # you really should never see this message
-            console_packet = ['console', "ERROR: STATE MACHINE NOT IN KNOWN STATE:", s, m_c.PRIO_TOP, 0, False]
+            console_packet = ['console', "ERROR: STATE MACHINE NOT IN KNOWN STATE:", s + "\nTHIS SHOULD NEVER HAPPEN",
+                              m_c.PRIO_TOP, 0, False]
             self.send_to_console(console_packet)
             self.set_state('freeze')
         return True
@@ -240,10 +242,34 @@ class StateCore:
 
 class MessageCore:
     def __init__(self, state):
-        self.venues = ['console']
+        self.venues = ['console', 'overhead']
         self.tag_list = []
         self.my_state = state
         self.messages = dict()
+
+
+"""create and change the overhead message"""
+
+
+def create_overhead(self, canvas):
+    self.overhead_canvas = canvas
+    s = "Once the game is over, the king and the pawn go back in the same box."
+    self.overhead_label = tk.Label(canvas, font="Helvetica 20", fg="black", bg="light gray", state="normal",
+                                   justify="center", wraplength=500, text=s, anchor="center", relief="raised")
+    canvas.create_window(300, 200, window=self.overhead_label, tag="over")
+    self.hide_overhead()
+
+
+def hide_overhead(self):
+    self.overhead_canvas.itemconfig("over", state="hidden")
+
+
+def show_overhead(self):
+    self.overhead_canvas.itemconfig("over", state="normal")
+
+
+def set_overhead(self, text):
+    self.overhead_label.config(text=text)
 
     def register_hoverbox(self, box):
         self.hover_box = box
