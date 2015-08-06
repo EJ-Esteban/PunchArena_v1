@@ -143,7 +143,7 @@ class TimeCore:
         # tick again after
         self.tick_num += 1
         if self.tick_num >= self.tick_mod:
-            self.tick_mod += 1
+            self.tick_epoch += 1
             self.tick_num = 0
         self.master.after(m_c.ANIM_DT, self.tick)
 
@@ -247,29 +247,24 @@ class MessageCore:
         self.my_state = state
         self.messages = dict()
 
+    """create and change the overhead message"""
 
-"""create and change the overhead message"""
+    def create_overhead(self, canvas):
+        self.overhead_canvas = canvas
+        s = "Once the game is over, the king and the pawn go back in the same box."
+        self.overhead_label = tk.Label(canvas, font="Helvetica 20", fg="black", bg="light gray", state="normal",
+                                       justify="center", wraplength=500, text=s, anchor="center", relief="raised")
+        canvas.create_window(300, 200, window=self.overhead_label, tag="over")
+        self.hide_overhead()
 
+    def hide_overhead(self):
+        self.overhead_canvas.itemconfig("over", state="hidden")
 
-def create_overhead(self, canvas):
-    self.overhead_canvas = canvas
-    s = "Once the game is over, the king and the pawn go back in the same box."
-    self.overhead_label = tk.Label(canvas, font="Helvetica 20", fg="black", bg="light gray", state="normal",
-                                   justify="center", wraplength=500, text=s, anchor="center", relief="raised")
-    canvas.create_window(300, 200, window=self.overhead_label, tag="over")
-    self.hide_overhead()
+    def show_overhead(self):
+        self.overhead_canvas.itemconfig("over", state="normal")
 
-
-def hide_overhead(self):
-    self.overhead_canvas.itemconfig("over", state="hidden")
-
-
-def show_overhead(self):
-    self.overhead_canvas.itemconfig("over", state="normal")
-
-
-def set_overhead(self, text):
-    self.overhead_label.config(text=text)
+    def set_overhead(self, text):
+        self.overhead_label.config(text=text)
 
     def register_hoverbox(self, box):
         self.hover_box = box

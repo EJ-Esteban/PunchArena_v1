@@ -127,7 +127,8 @@ class ConsoleWindow:
     def help(self, items):
         """probes methods for their help"""
         if items == "@givehelp":
-            self.print("okay, seriously, you're asking for help with the help function????")
+            self.print("okay, seriously, you're asking for help with the help function????"
+                       "\n(In all seriousness, for a full list of commands type commands)")
         else:
             if hasattr(self, items):
                 getattr(self, items)("@givehelp")
@@ -207,6 +208,18 @@ class ConsoleWindow:
                 return
             self.print("Forcing state machine into state: %s." % s)
             self.game.force_state(s)
+
+    def commands(self, items):
+        s = 'Valid commands:\n'
+        cmds = []
+        for f in self.function_list:
+            if f not in self.INTERNAL_FUNCTIONS:
+                cmds.append(f)
+        cmds.sort()
+        for f in cmds:
+            s += "\t" + f + '\n'
+        s += 'Type help followed by a command name to learn more about a command\n'
+        self.print(s)
 
 
 
