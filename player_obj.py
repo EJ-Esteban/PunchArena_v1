@@ -20,6 +20,9 @@ class Player(ProtoAnim):
 
         self.mode = pd.WALK
 
+        self.hp = self.max_hp = 10
+        self.mp = self.max_hp = 10
+
         self.x = self.y = 0
         self.next_x = self.next_y = 0
 
@@ -27,6 +30,9 @@ class Player(ProtoAnim):
 
         if not NPC:
             self.buttons = dict()
+
+    def check_stat(self, what='hp'):
+        return getattr(self, what, None)
 
     def attach_canvas(self, canvas=None):
         # players should attach to world canvas

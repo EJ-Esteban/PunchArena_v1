@@ -54,11 +54,12 @@ class Game:
         self.player1.attach_canvas(map_canvas)
         self.player1.create_sprite("player1")
         self.player1.register_object()
-        # this object DOES need access to the game state machine
+        # attaching all the relevant crap
         self.player1.attach_state_machine(self.my_state)
         self.player1.attach_worldmap(self.game_arena)
         self.player1.attach_message_core(self.my_msg)
         self.player1.set_coords(self.game_arena.playerPos[0], self.game_arena.playerPos[1])
+        self.my_state.append_player(self.player1)
 
     def launch_game_listeners(self, master):
         # bind listeners
@@ -165,8 +166,29 @@ class StateCore:
         self.forced = False
         self.my_msg = None
 
+        self.player_list = []
+        self.players_dead = []
+        self.players_alive = []
+
+        self.turn_forced = False
+
     def attach_message_core(self, msg):
         self.my_msg = msg
+
+    def append_player(self, player_obj):
+        if player_obj in self.player_list:
+            return False
+        self.player_list.append(player_obj)
+        self.players_alive.append(player_obj)
+        return True
+
+    def kill_player(self, player_obj):
+        """returns true if a player is successfully removed from the game"""
+        if player_obj not in self.player_list or player_obj not in self.players_alive:
+            return False
+        self.players_alive.remove(player_obj)
+        self.players_dead.append(player_obj)
+        return True
 
     def set_player(self, num):
         self.state_lock.acquire()
@@ -194,6 +216,17 @@ class StateCore:
         self.state_lock.release()
         return a
 
+    def force_turn_end(self):
+        self.state_lock.acquire()
+        self.turn_forced = True
+        self.state_lock.release()
+
+    def check_turn_forced(self):
+        self.state_lock.acquire()
+        t = self.turn_forced
+        self.state_lock.release()
+        return t
+
     def player_can_move(self, num):
         # creates concept of "turns
         s = self.check_state()
@@ -202,21 +235,18 @@ class StateCore:
     def finish_setup(self):
         self.set_state('player_turn')
 
-    def win_game(self):
-        self.set_state('endgame')
-
     def service(self):
         s = self.check_state()
         if s == 'player_turn':
-            pass
+            self.state_player_turn()
         elif s == 'in_turn_wait':
-            pass
+            self.state_in_turn_wait()
         elif s == 'pre_turn_wait':
-            pass
+            self.state_pre_turn_wait()
         elif s == 'change_players':
-            pass
+            self.state_change_players()
         elif s == 'endgame':
-            pass
+            self.state_endgame()
         elif s == 'freeze':
             return False
         elif s in ['error_check', 'error_set', 'setup']:
@@ -232,12 +262,88 @@ class StateCore:
             self.set_state('freeze')
         return True
 
+    def state_player_turn(self):
+        """stuff that happens on a player's turn"""
+        # check if game should be ended--all but one player is dead (or game is a draw)
+        self.reap_players()
+        gameover = self.check_if_winner()
+
+        # move to inturn wait if blocking animation(s) are playing
+        blocked = self.my_msg.animation_blocked()
+
+        # end turn if end has been forced
+
+        turn_end = self.check_turn_forced()
+
+        if gameover or blocked or turn_end:
+            # move to inturn wait until animations end
+            self.set_state('in_turn_wait')
+
+    def state_in_turn_wait(self):
+        self.reap_players()
+        gameover = self.check_if_winner()
+
+        # move to inturn wait if blocking animation(s) are playing
+        blocked = self.my_msg.animation_blocked()
+
+        if blocked:
+            return
+
+        if gameover:
+            self.set_state('endgame')
+
+        turn_end = self.check_turn_forced()
+        if turn_end:
+            self.set_state('change_players')
+
+        # by default return to player turn
+        self.set_state('player_turn')
+
+    def state_pre_turn_wait(self):
+        self.set_state()
+
+    def state_change_players(self):
+        # move to inturn wait if blocking animation(s) are playing
+        blocked = self.my_msg.animation_blocked()
+
+        if blocked:
+            return
+
+        self.set_state('player_turn')
+
+    def state_endgame(self):
+        pass
+
+    def reap_players(self):
+        """offically kills dead players"""
+        for player in self.players_alive:
+            hp = player.check_stat("hp")
+            max_hp = player.check_stat("max_hp")
+            if hp <= 0 or max_hp <= 0:
+                # player died due to hp being set to 0
+                self.kill_player(player)
+            if player.has_effect("unique_dead"):
+                # player has been killed by a special kill effect
+                self.kill_player(player)
+
+    def check_if_winner(self):
+        """checks if there's only one player
+        if nobody alive: game ends on a draw:
+        (possibly check for players being on teams in the future?)"""
+
+        # right now there's only one dude, so there's not really any winning.
+        # return len(self.players_alive) <= 1
+
+        # standing function for if the one player is dead
+        return len(self.players_alive) == 0
+
     def send_to_console(self, console_packet):
         if hasattr(self, 'msg_pipe'):
             self.msg_pipe.add_message_candidate("state_machine_msg", console_packet)
         else:
             print(console_packet[1])
             print(console_packet[2])
+
 
 
 class MessageCore:

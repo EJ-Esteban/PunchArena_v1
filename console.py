@@ -209,6 +209,16 @@ class ConsoleWindow:
             self.print("Forcing state machine into state: %s." % s)
             self.game.force_state(s)
 
+    def checkstate(self, items):
+        if items == "@givehelp":
+            self.print("prints current state machine")
+            self.print(str(StateCore.valid_states))
+        else:
+            s = self.game.my_state.check_state()
+            self.print("The current game state is " + s + "\n")
+
+
+
     def commands(self, items):
         s = 'Valid commands:\n'
         cmds = []
