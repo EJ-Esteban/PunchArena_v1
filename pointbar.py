@@ -27,6 +27,7 @@ class PointBar(ProtoAnim):
         self.anim_count = 0
         self.block = False
         self.rounding_insurance = 0
+        self.flashcount = 2
 
     def attach_canvas(self, canvas=None):
         self.my_canvas = canvas
@@ -93,6 +94,7 @@ class PointBar(ProtoAnim):
         #this also resets percent full
         self.fast_redraw()
         self.play_state = 'drain'
+        self.flashcount = 4
         if blocking:
             self.block = True
             self.my_time.add_blocking_animation()
@@ -111,20 +113,27 @@ class PointBar(ProtoAnim):
             self.anim_count-= 1
             if self.anim_count <= 0:
                 #really should never be less than 0 but here we are
-                self.anim_count = 5
+                self.anim_count = 3
                 self.play_state = 'flash'
         elif self.play_state == 'flash':
             self.anim_count-= 1
             if self.anim_count <= 0:
-                barcoord = PointBar.BAR_LOW + int((PointBar.BAR_HI - PointBar.BAR_LOW) * self.pctFull)
-                self.my_canvas.coords("flash", PointBar.BAR_LOW, 0, barcoord, 50)
-                if self.block:
-                    self.my_time.rm_blocking_animation()
-                    self.block = False
-                self.player.cur_value = self.rounding_insurance
-                self.update_bar_nums()
-                self.player.hp = self.rounding_insurance
-                self.play_state = 'static'
+                self.flashcount -=1
+                if (self.flashcount %2) == 0:
+                    self.my_canvas.itemconfig("flash", state = "normal")
+                else:
+                    self.my_canvas.itemconfig("flash", state = "hidden")
+                self.anim_count = 3
+                if self.flashcount <= 0:
+                    barcoord = PointBar.BAR_LOW + int((PointBar.BAR_HI - PointBar.BAR_LOW) * self.pctFull)
+                    self.my_canvas.coords("flash", PointBar.BAR_LOW, 0, barcoord, 50)
+                    if self.block:
+                        self.my_time.rm_blocking_animation()
+                        self.block = False
+                    self.player.cur_value = self.rounding_insurance
+                    self.update_bar_nums()
+                    self.player.hp = self.rounding_insurance
+                    self.play_state = 'static'
         else:
             self.send_to_console("A pointbar was found in an invalid animation state.", val=1)
             self.play_state == 'static'
