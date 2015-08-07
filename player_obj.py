@@ -12,22 +12,23 @@ class Player(ProtoAnim):
     key_map = {'q': pd.WALK, 'w': pd.PUNCH,
                'e': pd.BLOCK, 'r': pd.GRAB}
 
-    def __init__(self, name, my_time, NPC=True):
+    def __init__(self, name, my_time, NPC=True, pid = 1):
         ProtoAnim.__init__(self, name, my_time)
 
         self.tick_til = pd.PLAYER_ANIM_DELAY
         self.facing = m_c.NORTH
 
         self.mode = pd.WALK
-
+        #primary stats
         self.hp = self.max_hp = 10
         self.mp = self.max_hp = 10
+        #stats that mainly interact with the world and state machine
         self.canwalk = self.maxwalk = 3
-
+        self.active_effects = []
+        self.playerID = pid
+        #stats that have to do with world position
         self.x = self.y = 0
         self.next_x = self.next_y = 0
-
-        self.active_effects = []
 
         if not NPC:
             self.buttons = dict()
@@ -119,7 +120,7 @@ class Player(ProtoAnim):
         self.canwalk = self.maxwalk
 
     def is_turn(self):
-        return self.game_state.player_can_move(1)
+        return self.game_state.player_can_move(self.playerID)
 
     def move_arrow(self, dir):
         self.rm_effect("blocking")

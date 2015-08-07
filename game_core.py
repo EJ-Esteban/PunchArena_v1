@@ -51,7 +51,7 @@ class Game:
 
     def place_player_char(self, map_canvas):
         # create player
-        self.player1 = Player("player1", self.my_time, NPC=False)
+        self.player1 = Player("player1", self.my_time, NPC=False, pid = 1)
         # associate player with canvas, create sprite, and register for animation
         self.player1.attach_canvas(map_canvas)
         self.player1.create_sprite("player1")
@@ -341,7 +341,7 @@ class StateCore:
         next_player = self.players_alive[next_player_num - 1]
         self.player = next_player_num
 
-        overhead_msg = ['overhead', "player %d's turn!" % next_player_num, "", m_c.PRIO_TOP, 20, False]
+        overhead_msg = ['overhead', "player %d's turn!" % next_player_num, "", m_c.PRIO_TOP, 25, False]
         self.my_msg.add_message_candidate('statemachine', overhead_msg)
 
         next_player.refill_walking()
@@ -483,7 +483,7 @@ class GameInput:
     def key_detect(event):
         foo = event.char
         player = game_object.player1
-        if foo in player.key_map.keys():
+        if foo in player.key_map.keys() and player.is_turn():
             player.set_move(player.key_map[foo])
 
     def space_detect(event):
