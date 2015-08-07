@@ -30,6 +30,8 @@ class Game:
         self.my_state.attach_message_core(self.my_msg)
         # create time core (animation, state machine update)
         self.my_time = TimeCore(master, self.my_state, self.my_msg)
+        self.my_state.attach_time_core(self.my_time)
+        self.my_msg.attach_time_core(self.my_time)
 
     def launch_game_graphics(self, master, arena='tt'):
         # setup window
@@ -154,10 +156,25 @@ class TimeCore:
         self.msg_lock.release()
         return probe
 
+    def add_blocking_animation(self):
+        self.msg_lock.acquire()
+        self.blocking_anims += 1
+        self.msg_lock.release()
+
+    def rm_blocking_animation(self):
+        self.msg_lock.acquire()
+        self.blocking_anims -= 1
+        if self.blocking_anims < 0:
+            self.state_core.set_state('error_external')
+        self.msg_lock.release()
+
 
 class StateCore:
-    valid_states = ('setup', 'player_turn', 'in_turn_wait',
-                    'pre_turn_wait', 'change_players', 'endgame', 'error_check', 'error_set', 'freeze')
+    valid_states = (
+        'setup', 'player_turn', 'in_turn_wait', 'pre_turn_wait', 'change_players', 'endgame', 'error_check',
+        'error_set',
+        'error_external'
+        , 'freeze')
 
     def __init__(self):
         self.state = 'setup'
@@ -165,6 +182,7 @@ class StateCore:
         self.state_lock = threading.Lock()
         self.forced = False
         self.my_msg = None
+        self.my_time = None
 
         self.player_list = []
         self.players_dead = []
@@ -174,6 +192,9 @@ class StateCore:
 
     def attach_message_core(self, msg):
         self.my_msg = msg
+
+    def attach_time_core(self, time):
+        self.my_time = time
 
     def append_player(self, player_obj):
         if player_obj in self.player_list:
@@ -254,6 +275,11 @@ class StateCore:
                               False]
             self.send_to_console(console_packet)
             self.set_state('freeze')
+        elif s == 'error_external':
+            console_packet = ['console', "ERROR: EXTERNAL ERROR DETECTED", s, m_c.PRIO_TOP, 0,
+                              False]
+            self.send_to_console(console_packet)
+            self.set_state('freeze')
         else:
             # you really should never see this message
             console_packet = ['console', "ERROR: STATE MACHINE NOT IN KNOWN STATE:", s + "\nTHIS SHOULD NEVER HAPPEN",
@@ -269,7 +295,7 @@ class StateCore:
         gameover = self.check_if_winner()
 
         # move to inturn wait if blocking animation(s) are playing
-        blocked = self.my_msg.animation_blocked()
+        blocked = self.my_time.animation_blocked()
 
         # end turn if end has been forced
 
@@ -284,7 +310,7 @@ class StateCore:
         gameover = self.check_if_winner()
 
         # move to inturn wait if blocking animation(s) are playing
-        blocked = self.my_msg.animation_blocked()
+        blocked = self.my_time.animation_blocked()
 
         if blocked:
             return
@@ -293,23 +319,34 @@ class StateCore:
             self.set_state('endgame')
 
         turn_end = self.check_turn_forced()
+
         if turn_end:
+            self.state_lock.acquire()
+            self.turn_forced = False
+            self.state_lock.release()
             self.set_state('change_players')
+            return
 
         # by default return to player turn
         self.set_state('player_turn')
 
     def state_pre_turn_wait(self):
-        self.set_state()
+        self.set_state('player_turn')
 
     def state_change_players(self):
-        # move to inturn wait if blocking animation(s) are playing
-        blocked = self.my_msg.animation_blocked()
+        # this will probably have to be brushed up when more players start appearing
+        player_count = len(self.players_alive)
+        next_player_num = (self.player + 1) % player_count + 1
 
-        if blocked:
-            return
+        next_player = self.players_alive[next_player_num - 1]
+        self.player = next_player_num
 
-        self.set_state('player_turn')
+        overhead_msg = ['overhead', "player %d's turn!" % next_player_num, "", m_c.PRIO_TOP, 20, False]
+        self.my_msg.add_message_candidate('statemachine', overhead_msg)
+
+        next_player.refill_walking()
+
+        self.set_state('pre_turn_wait')
 
     def state_endgame(self):
         pass
@@ -345,13 +382,15 @@ class StateCore:
             print(console_packet[2])
 
 
-
 class MessageCore:
     def __init__(self, state):
         self.venues = ['console', 'overhead']
         self.tag_list = []
         self.my_state = state
         self.messages = dict()
+
+    def attach_time_core(self, time):
+        self.my_time = time
 
     """create and change the overhead message"""
 
@@ -400,20 +439,44 @@ class MessageCore:
         return winners, winningtag
 
     def play_messages(self):
-        messages, tags = self.elect_messages()
+        w_messages, w_tags = self.elect_messages()
 
         # plays leading console message
-        if not (messages['console'][3] == -1):  # eliminates blank messages
-            consoletext = messages['console'][1]
-            consoletext += "\n" + messages['console'][2]
+        if not (w_messages['console'][3] == -1):  # eliminates blank messages
+            consoletext = w_messages['console'][1]
+            consoletext += "\n" + w_messages['console'][2]
             if game_console:  # prints to console window if console it attached
                 game_console.print(consoletext)
             else:
                 print(consoletext)
-            self.remove_message_candidate(tags['console'])
+            self.remove_message_candidate(w_tags['console'])
+
+        # draws hover box
+        if (w_messages['overhead'][3] == -1):  # hides overhead on blank message
+            self.hide_overhead()
+        else:
+            self.show_overhead()
+            overtext = w_messages['overhead']
+            overtag = w_tags['overhead']
+            self.set_overhead(overtext[1])
+
+            if (overtext[5] == False):
+                overtext[5] = True
+                self.my_time.add_blocking_animation()
+
+            overtext[3] = m_c.PRIO_PLAYING
+            overtext[4] -= 1
+            if (overtext[4] <= 0):
+                self.my_time.rm_blocking_animation()
+                self.remove_message_candidate(overtag)
+
+            else:
+                self.messages[overtag] = overtext
+
+
         # redraws hover message
         if ('hover' in self.venues):
-            self.hover_box.rewrite_text(messages['hover'][1], messages['hover'][2])
+            self.hover_box.rewrite_text(w_messages['hover'][1], w_messages['hover'][2])
 
 
 class GameInput:

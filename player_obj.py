@@ -22,6 +22,7 @@ class Player(ProtoAnim):
 
         self.hp = self.max_hp = 10
         self.mp = self.max_hp = 10
+        self.canwalk = self.maxwalk = 3
 
         self.x = self.y = 0
         self.next_x = self.next_y = 0
@@ -114,6 +115,9 @@ class Player(ProtoAnim):
         move = pd.MOVELIST[self.mode]
         self.send_to_console("Equipped move " + move[0], val=3)
 
+    def refill_walking(self):
+        self.canwalk = self.maxwalk
+
     def is_turn(self):
         return self.game_state.player_can_move(1)
 
@@ -137,6 +141,8 @@ class Player(ProtoAnim):
         button.add_button_description(pd.MOVELIST[pd.THROW][2], pd.MOVELIST[pd.THROW][3])
         self.mode = pd.THROW
         self.key_map['r'] = pd.THROW
+        self.game_state.force_turn_end()
+
 
     def throw(self, dir=-1):
         print("throw")
@@ -150,6 +156,8 @@ class Player(ProtoAnim):
         button.add_button_description(pd.MOVELIST[pd.GRAB][2], pd.MOVELIST[pd.GRAB][3])
         self.mode = pd.GRAB
         self.key_map['r'] = pd.GRAB
+        self.game_state.force_turn_end()
+
 
     def punch(self, dir):
         self.facing = dir
@@ -173,11 +181,14 @@ class Player(ProtoAnim):
         self.anim_frame = 2  # set to punch frame
         self.tick_til = pd.PLAYER_ANIM_DELAY_LONG
         self.animate()
+        self.game_state.force_turn_end()
+
 
     def block(self, dir):
         self.facing = dir
         self.add_effect("blocking")
         self.animate()
+        self.game_state.force_turn_end()
 
     def walk(self, dir):
         if not self.is_turn():
@@ -196,6 +207,11 @@ class Player(ProtoAnim):
         self.predict(dx, dy)
         s = "Path was "
         if self.my_world.can_walk_tile(self.next_x, self.next_y):
+            self.animate()
+            self.canwalk -= 1
+            if self.canwalk == 0:
+                self.game_state.force_turn_end()
+
             self.set_coords(self.next_x, self.next_y)
             s += "taken."
         else:
@@ -204,7 +220,6 @@ class Player(ProtoAnim):
         self.send_to_console(
             "Trying to move Player " + self.name + " to " + str(self.next_x) + "," + str(self.next_y), s, val=2)
         self.my_world.service_tile(self.x, self.y, self)
-        self.animate()
 
     def predict(self, dx, dy):
         # adds coordinates to try
