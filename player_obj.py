@@ -193,6 +193,7 @@ class Player(ProtoAnim):
         self.facing = dir
         self.add_effect("blocking")
         self.animate()
+        self.my_world.service_tile(self.x, self.y, self)
         self.game_state.force_turn_end()
 
     def walk(self, dir):

@@ -157,9 +157,11 @@ class World_map:
                     obj.rm_effect("dampfeet")
                     map_tiles[y][x].send_to_console(obj.name + " cooled the lava but was singed.", val=2)
                     obj.add_effect("hotfeet")
+                    obj.drain_hp(1)
                 else:
                     map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
                     obj.add_effect("hotfeet")
+                    obj.drain_hp(3)
             if mode is pd.GRAB:
                 map_tiles[y][x].send_to_console(obj.name + " got burned!", val=2)
                 obj.add_effect("hotfeet")
@@ -192,6 +194,9 @@ class World_map:
             obj.rm_effect("dampfeet")
             if mode is pd.GRAB:
                 obj.add_hand_effect("handwet")
+            if mode in [pd.WALK, pd.BLOCK, pd.GRAB]:
+                #you can't swim! punish them!
+                obj.drain_hp(1)
 
     def service_obs(self, obj=None):
         if type(obj) is Player:
