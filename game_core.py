@@ -85,6 +85,13 @@ class Game:
     def force_state(self, s):
         self.my_state.set_state(s)
 
+    def force_p1_drainhp(self,amount):
+        self.player1.drain_hp(amount)
+
+    def force_p1_drainmp(self,amount):
+        self.player1.drain_mp(amount)
+
+
 
 class TimeCore:
     """
@@ -314,9 +321,10 @@ class StateCore:
 
         if blocked:
             return
-
+        #print("inturn wait")
         if gameover:
             self.set_state('endgame')
+            return
 
         turn_end = self.check_turn_forced()
 
@@ -331,9 +339,14 @@ class StateCore:
         self.set_state('player_turn')
 
     def state_pre_turn_wait(self):
+        blocked = self.my_time.animation_blocked()
+        if blocked:
+            return
+        #print("pre turn wait")
         self.set_state('player_turn')
 
     def state_change_players(self):
+        print("player change")
         # this will probably have to be brushed up when more players start appearing
         player_count = len(self.players_alive)
         next_player_num = (self.player + 1) % player_count + 1
@@ -349,7 +362,9 @@ class StateCore:
         self.set_state('pre_turn_wait')
 
     def state_endgame(self):
-        pass
+        overhead_msg = ['overhead', "Draw!", "", m_c.PRIO_TOP, 0, False]
+        self.my_msg.add_message_candidate('statemachine', overhead_msg)
+        self.set_state('freeze')
 
     def reap_players(self):
         """offically kills dead players"""
@@ -466,7 +481,7 @@ class MessageCore:
 
             overtext[3] = m_c.PRIO_PLAYING
             overtext[4] -= 1
-            if (overtext[4] <= 0):
+            if (overtext[4] == 0):
                 self.my_time.rm_blocking_animation()
                 self.remove_message_candidate(overtag)
 

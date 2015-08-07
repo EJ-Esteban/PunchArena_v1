@@ -75,6 +75,7 @@ class StatBar:
         hp_bar.attach_canvas(hpcanvas)
         hp_bar.create_bar_image()
         hpcanvas.grid(row=1, column=0)
+        hp_bar.register_object()
         # MP Bar
         mpcanvas = tk.Canvas(self.master, bg='pink', width=m_c.bar_w, height=m_c.bar_h, highlightthickness=0)
         mp_bar = PointBar("playerMP", self.my_time)
@@ -83,6 +84,10 @@ class StatBar:
         mpcanvas.grid(row=2, column=0)
         mp_bar.recolor_bar("light blue", "blue")
         mp_bar.retype_bar("MP")
+        mp_bar.register_object()
+
+        player = self.my_player
+        player.attach_hp_mp_bar(hp_bar,mp_bar)
 
     def get_hover(self):
         return self.hover_bar

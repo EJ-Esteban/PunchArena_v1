@@ -217,6 +217,15 @@ class ConsoleWindow:
             s = self.game.my_state.check_state()
             self.print("The current game state is " + s + "\n")
 
+    def drainhp(self,items):
+        if items == "@givehelp":
+            self.print("Usage: drainhp X")
+            self.print("drains X hp from player 1")
+        else:
+            if not items.isdigit():
+                self.print("Error--use an integer, idiot.")
+            else:
+                self.game.force_p1_drainhp(int(items))
 
 
     def commands(self, items):

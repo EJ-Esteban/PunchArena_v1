@@ -43,6 +43,10 @@ class Player(ProtoAnim):
     def attach_worldmap(self, map_obj):
         self.my_world = map_obj
 
+    def attach_hp_mp_bar(self,hp,mp):
+        self.hp_bar = hp
+        self.mp_bar = mp
+
     def bind_button(self, obj, key):
         self.buttons[key] = obj
 
@@ -235,6 +239,12 @@ class Player(ProtoAnim):
             self.next_y = 7
         if (self.next_y > 7):
             self.next_y = 0
+
+    def drain_hp(self,amount):
+        self.hp_bar.start_drain_points(self,amount,type= 'hp')
+
+    def drain_mp(self,amount):
+        self.mp_bar.start_drain_points(self,amount,type= 'mp')
 
     def animate(self):
         """take action on animatino"""
