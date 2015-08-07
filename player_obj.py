@@ -21,7 +21,7 @@ class Player(ProtoAnim):
         self.mode = pd.WALK
         #primary stats
         self.hp = self.max_hp = 10
-        self.mp = self.max_hp = 10
+        self.mp = self.max_mp = 10
         #stats that mainly interact with the world and state machine
         self.canwalk = self.maxwalk = 3
         self.active_effects = []

@@ -71,7 +71,7 @@ class Game:
         master.bind('<Up>', GameInput.upKey)
         master.bind('<Down>', GameInput.downKey)
         master.bind('<KeyPress>', GameInput.key_detect)
-
+    """console commands"""
     def attach_console(self, console):
         global game_console
         game_console = console
@@ -362,7 +362,7 @@ class StateCore:
         self.set_state('pre_turn_wait')
 
     def state_endgame(self):
-        overhead_msg = ['overhead', "Draw!", "", m_c.PRIO_TOP, 0, False]
+        overhead_msg = ['overhead', "Game Over:\nDraw!", "", m_c.PRIO_TOP, 0, False]
         self.my_msg.add_message_candidate('statemachine', overhead_msg)
         self.set_state('freeze')
 

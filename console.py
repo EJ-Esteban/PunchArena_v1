@@ -227,6 +227,15 @@ class ConsoleWindow:
             else:
                 self.game.force_p1_drainhp(int(items))
 
+    def drainmp(self,items):
+        if items == "@givehelp":
+            self.print("Usage: drainmp X")
+            self.print("drains X mp from player 1")
+        else:
+            if not items.isdigit():
+                self.print("Error--use an integer, idiot.")
+            else:
+                self.game.force_p1_drainmp(int(items))
 
     def commands(self, items):
         s = 'Valid commands:\n'

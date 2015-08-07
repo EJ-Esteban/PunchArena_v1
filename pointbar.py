@@ -28,6 +28,7 @@ class PointBar(ProtoAnim):
         self.block = False
         self.rounding_insurance = 0
         self.flashcount = 2
+        self.bartype = 'hp'
 
     def attach_canvas(self, canvas=None):
         self.my_canvas = canvas
@@ -95,6 +96,7 @@ class PointBar(ProtoAnim):
         self.fast_redraw()
         self.play_state = 'drain'
         self.flashcount = 4
+        self.bartype = type
         if blocking:
             self.block = True
             self.my_time.add_blocking_animation()
@@ -132,7 +134,10 @@ class PointBar(ProtoAnim):
                         self.block = False
                     self.player.cur_value = self.rounding_insurance
                     self.update_bar_nums()
-                    self.player.hp = self.rounding_insurance
+                    if self.bartype =='hp':
+                        self.player.hp = self.rounding_insurance
+                    elif self.bartype =='mp':
+                        self.player.mp = self.rounding_insurance
                     self.play_state = 'static'
         else:
             self.send_to_console("A pointbar was found in an invalid animation state.", val=1)
