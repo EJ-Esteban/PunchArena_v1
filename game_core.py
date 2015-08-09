@@ -51,7 +51,7 @@ class Game:
 
     def place_player_char(self, map_canvas):
         # create player
-        self.player1 = Player("player1", self.my_time, NPC=False, pid = 1)
+        self.player1 = Player("player1", self.my_time, NPC=False, pid=1)
         # associate player with canvas, create sprite, and register for animation
         self.player1.attach_canvas(map_canvas)
         self.player1.create_sprite("player1")
@@ -71,7 +71,9 @@ class Game:
         master.bind('<Up>', GameInput.upKey)
         master.bind('<Down>', GameInput.downKey)
         master.bind('<KeyPress>', GameInput.key_detect)
+
     """console commands"""
+
     def attach_console(self, console):
         global game_console
         game_console = console
@@ -85,12 +87,11 @@ class Game:
     def force_state(self, s):
         self.my_state.set_state(s)
 
-    def force_p1_drainhp(self,amount):
+    def force_p1_drainhp(self, amount):
         self.player1.drain_hp(amount)
 
-    def force_p1_drainmp(self,amount):
+    def force_p1_drainmp(self, amount):
         self.player1.drain_mp(amount)
-
 
 
 class TimeCore:
@@ -321,7 +322,7 @@ class StateCore:
 
         if blocked:
             return
-        #print("inturn wait")
+        # print("inturn wait")
         if gameover:
             self.set_state('endgame')
             return
@@ -342,11 +343,11 @@ class StateCore:
         blocked = self.my_time.animation_blocked()
         if blocked:
             return
-        #print("pre turn wait")
+        # print("pre turn wait")
         self.set_state('player_turn')
 
     def state_change_players(self):
-        print("player change")
+        # print("player change")
         # this will probably have to be brushed up when more players start appearing
         player_count = len(self.players_alive)
         next_player_num = (self.player + 1) % player_count + 1
